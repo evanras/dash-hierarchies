@@ -91,6 +91,7 @@ app.layout = html.Div([
         style={"maxHeight": "400px"},
         indexColumnWidth='300px'
     ),
+    html.Div("The items below are normal callbacks built with this component."),
     html.Div(id='selected-item-output'),
     html.Div(id='selected-column-output')
 ])
