@@ -25,7 +25,7 @@ and progress bars. It is designed to be used as a Dash component.
 @param {string} props.colors.background - Color for the unfilled portion of progress bars
 @param {Object} props.styles - Custom styles to apply to the container
 @param {string} props.className - CSS class names to apply to the container
-@param {Object} props.selectedItem - Currently selected item (for controlled component)
+@param {string} props.selectedItem - Name of the currently selected item (for controlled component)
 @param {Function} props.setProps - Dash callback to update props
 @returns {React.ReactNode} - Rendered hierarchical data component
 
