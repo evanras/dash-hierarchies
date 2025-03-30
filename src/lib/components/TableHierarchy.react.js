@@ -27,7 +27,7 @@ const TableHierarchyRow = ({
   onRowClick,
   cellStyles,
   hoveredColumn,
-  selectedColumn
+  selectedColumn,
 }) => {
   // Track expanded/collapsed state
   const [isExpanded, setIsExpanded] = useState(false);
@@ -67,6 +67,7 @@ const TableHierarchyRow = ({
       >
         {/* Index Column with Indentation and Caret */}
         <td 
+          className="index-column"
           style={{
             ...cellStyles,
             position: 'sticky',
@@ -166,6 +167,7 @@ const TableHierarchyRow = ({
  * - Sticky headers
  * - Expandable/collapsible rows
  * - Column selection callbacks
+ * - Resizable index column
  * 
  * @param {Object} props - Component props
  * @param {string} props.id - The ID used to identify this component in Dash callbacks
@@ -176,6 +178,7 @@ const TableHierarchyRow = ({
  * @param {string} props.className - CSS class names to apply to the container
  * @param {Object} props.selectedItem - Currently selected item (for controlled component)
  * @param {Object} props.selectedColumn - Currently selected column (for controlled component)
+ * @param {string} props.indexColumnWidth - The width of the index column 
  * @param {Function} props.setProps - Dash callback to update props
  * @returns {React.ReactNode} - Rendered hierarchical table component
  */
@@ -189,16 +192,13 @@ const TableHierarchy = (props) => {
     className = '',
     selectedItem = null,
     selectedColumn = null,
+    indexColumnWidth = '200px',
     setProps
   } = props;
 
-  // Create a ref for the container div
+  // Create a ref for the container div and table
   const containerRef = useRef(null);
-  // Track table dimensions
-  const [tableDimensions, setTableDimensions] = useState({
-    width: 0,
-    height: 0
-  });
+  const tableRef = useRef(null);
   
   // Track which column is being hovered over
   const [hoveredColumn, setHoveredColumn] = useState(null);
@@ -206,12 +206,7 @@ const TableHierarchy = (props) => {
   // Update table dimensions when window resizes
   useEffect(() => {
     const updateDimensions = () => {
-      if (containerRef.current) {
-        setTableDimensions({
-          width: containerRef.current.offsetWidth,
-          height: containerRef.current.offsetHeight
-        });
-      }
+      // Any dimension update logic if needed
     };
 
     // Initial dimensions
@@ -225,6 +220,134 @@ const TableHierarchy = (props) => {
       window.removeEventListener('resize', updateDimensions);
     };
   }, []);
+
+  // Add resize functionality after component mounts
+  useEffect(() => {
+    if (!tableRef.current) return;
+    
+    // Get the table element
+    const table = tableRef.current;
+    
+    // Function to make the first column resizable
+    const makeIndexColumnResizable = () => {
+      // Get the first row's first cell (index column header)
+      const headerRow = table.querySelector('thead tr');
+      if (!headerRow) return;
+      
+      const indexCell = headerRow.children[0];
+      if (!indexCell) return;
+      
+      // Set initial width from prop
+      indexCell.style.width = indexColumnWidth;
+      
+      // Create resizer div
+      const resizer = document.createElement('div');
+      resizer.style.position = 'absolute';
+      resizer.style.top = '0';
+      resizer.style.right = '0';
+      resizer.style.width = '5px';
+      resizer.style.height = '100%';
+      resizer.style.cursor = 'col-resize';
+      resizer.style.userSelect = 'none';
+      resizer.style.zIndex = '10';
+      
+      // Position the cell relatively for absolutely positioned resizer
+      indexCell.style.position = 'relative';
+      indexCell.appendChild(resizer);
+      
+      // Add mouse event listeners
+      let pageX, curColWidth, tableWidth;
+      
+      // Show visual feedback on hover
+      resizer.addEventListener('mouseover', () => {
+        resizer.style.borderRight = '2px solid #0000ff';
+      });
+      
+      resizer.addEventListener('mouseout', () => {
+        resizer.style.borderRight = '';
+      });
+      
+      // Start resizing
+      resizer.addEventListener('mousedown', (e) => {
+        // Prevent text selection during drag
+        e.preventDefault();
+        
+        // Get starting positions
+        pageX = e.pageX;
+        curColWidth = indexCell.offsetWidth;
+        tableWidth = table.offsetWidth;
+        
+        // Add document-level event listeners
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
+      });
+      
+      // Handle resizing
+      const onMouseMove = (e) => {
+        // Calculate width change
+        const diffX = e.pageX - pageX;
+        
+        // Apply new width to the index column
+        const newWidth = Math.max(100, curColWidth + diffX); // Minimum 100px
+        indexCell.style.width = newWidth + 'px';
+        
+        // Update all cells with .index-column class to match the new width
+        const allIndexCells = table.querySelectorAll('.index-column');
+        allIndexCells.forEach(cell => {
+          cell.style.width = newWidth + 'px';
+        });
+      };
+      
+      // End resizing
+      const onMouseUp = () => {
+        // Remove document-level event listeners
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
+        
+        // Get final width
+        const finalWidth = indexCell.offsetWidth + 'px';
+        
+        // Update the prop via setProps if available
+        if (setProps) {
+          setProps({ indexColumnWidth: finalWidth });
+        }
+      };
+    };
+    
+    // Initialize resizable functionality
+    makeIndexColumnResizable();
+    
+    // Function to enforce sticky positioning
+    const enforceStickyPositioning = () => {
+      const container = containerRef.current;
+      if (!container) return;
+      
+      // Ensure the index header and cells stay sticky when scrolling horizontally
+      container.addEventListener('scroll', () => {
+        const indexHeader = table.querySelector('thead th.index-column');
+        const indexCells = table.querySelectorAll('tbody td.index-column');
+        
+        if (indexHeader) {
+          indexHeader.style.left = `${container.scrollLeft}px`;
+        }
+        
+        indexCells.forEach(cell => {
+          cell.style.left = `${container.scrollLeft}px`;
+        });
+      });
+    };
+    
+    // Initialize sticky positioning
+    enforceStickyPositioning();
+    
+    // Clean up any event listeners if component unmounts
+    return () => {
+      const container = containerRef.current;
+      if (container) {
+        container.removeEventListener('scroll', () => {});
+      }
+    };
+  }, [tableRef.current, containerRef.current, indexColumnWidth]);
 
   // Define SVG for carets to avoid external dependencies
   const openCaret = (
@@ -313,6 +436,19 @@ const TableHierarchy = (props) => {
     zIndex: 2
   };
 
+  // Custom CSS for ensuring proper sticky behavior
+  // This is added to ensure the stickiness works correctly across browsers
+  const stickyStyles = `
+    .index-column {
+      position: sticky !important;
+      left: 0 !important;
+      z-index: 1;
+    }
+    thead th.index-column {
+      z-index: 3 !important;
+    }
+  `;
+
   return (
     <div 
       id={id}
@@ -328,16 +464,26 @@ const TableHierarchy = (props) => {
         ...style
       }}
     >
-      <table style={{ 
-        width: '100%', 
-        borderCollapse: 'separate',
-        borderSpacing: 0,
-        tableLayout: 'fixed'
-      }}>
+      {/* Add custom CSS styles for sticky positioning */}
+      <style>
+        {stickyStyles}
+      </style>
+      
+      <table 
+        ref={tableRef}
+        className="resizable-table"
+        style={{ 
+          width: '100%', 
+          borderCollapse: 'separate',
+          borderSpacing: 0,
+          tableLayout: 'fixed'
+        }}
+      >
         <thead>
           <tr>
             {/* Index Column Header (Sticky) */}
             <th 
+              className="index-column"
               style={{
                 ...headerCellStyles,
                 position: 'sticky',
@@ -345,11 +491,12 @@ const TableHierarchy = (props) => {
                 zIndex: 3, // Higher z-index for the corner
                 backgroundColor: 'white',
                 borderRight: '1px solid #e5e7eb',
-                width: columns.find(col => col.name === indexColumnName)?.width || '200px',
+                width: indexColumnWidth,
                 boxShadow: '2px 0 4px -2px rgba(0, 0, 0, 0.1)'
               }}
             >
               {indexColumnName}
+              {/* Resize handle will be added by useEffect */}
             </th>
             
             {/* Other Column Headers */}
@@ -459,6 +606,12 @@ TableHierarchy.propTypes = {
   }),
 
   /**
+   * Width of the index column (leftmost column).
+   * Can be updated by the user via drag-to-resize.
+   */
+  indexColumnWidth: PropTypes.string,
+
+  /**
    * Dash-assigned callback that should be called to report property changes
    * to Dash, to make them available for callbacks.
    */
@@ -473,7 +626,8 @@ TableHierarchy.defaultProps = {
   columns: [],
   style: {},
   selectedItem: null,
-  selectedColumn: null
+  selectedColumn: null,
+  indexColumnWidth: '200px'
 };
 
 export default TableHierarchy;

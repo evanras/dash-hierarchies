@@ -88,7 +88,8 @@ app.layout = html.Div([
         data=data,
         columns=columns,
         indexColumnName="Forecast Decomposition",
-        style={"maxHeight": "400px"}
+        style={"maxHeight": "400px"},
+        indexColumnWidth='300px'
     ),
     html.Div(id='selected-item-output'),
     html.Div(id='selected-column-output')

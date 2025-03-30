@@ -21,6 +21,7 @@ This component displays hierarchical data in a table format with support for:
 - Sticky headers
 - Expandable/collapsible rows
 - Column selection callbacks
+- Resizable index column
 
 @param {Object} props - Component props
 @param {string} props.id - The ID used to identify this component in Dash callbacks
@@ -31,6 +32,7 @@ This component displays hierarchical data in a table format with support for:
 @param {string} props.className - CSS class names to apply to the container
 @param {Object} props.selectedItem - Currently selected item (for controlled component)
 @param {Object} props.selectedColumn - Currently selected column (for controlled component)
+@param {string} props.indexColumnWidth - The width of the index column 
 @param {Function} props.setProps - Dash callback to update props
 @returns {React.ReactNode} - Rendered hierarchical table component
 
@@ -60,6 +62,10 @@ Keyword arguments:
 - indexColumnName (string; required):
     Name of the column to use as the index (leftmost column). This
     column will be sticky when horizontally scrolling.
+
+- indexColumnWidth (string; default '200px'):
+    Width of the index column (leftmost column). Can be updated by the
+    user via drag-to-resize.
 
 - selectedColumn (dict; optional):
     Object representing the currently selected column (controlled
@@ -109,11 +115,12 @@ Keyword arguments:
         className: typing.Optional[str] = None,
         selectedItem: typing.Optional[dict] = None,
         selectedColumn: typing.Optional["SelectedColumn"] = None,
+        indexColumnWidth: typing.Optional[str] = None,
         **kwargs
     ):
-        self._prop_names = ['id', 'className', 'columns', 'data', 'indexColumnName', 'selectedColumn', 'selectedItem', 'style']
+        self._prop_names = ['id', 'className', 'columns', 'data', 'indexColumnName', 'indexColumnWidth', 'selectedColumn', 'selectedItem', 'style']
         self._valid_wildcard_attributes =            []
-        self.available_properties = ['id', 'className', 'columns', 'data', 'indexColumnName', 'selectedColumn', 'selectedItem', 'style']
+        self.available_properties = ['id', 'className', 'columns', 'data', 'indexColumnName', 'indexColumnWidth', 'selectedColumn', 'selectedItem', 'style']
         self.available_wildcard_properties =            []
         _explicit_args = kwargs.pop('_explicit_args')
         _locals = locals()
