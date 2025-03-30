@@ -19,6 +19,25 @@ data=[
                         "name": "Lags3",
                         "percentage": 2,
                         "children": None
+                    },
+                    {
+                        "id": 6,
+                        "name": "Lags4",
+                        "percentage": 52,
+                        "children": [
+                            {
+                                "id": 8,
+                                "name": "Child Lags",
+                                "percentage": 23,
+                                "children": None
+                            }
+                        ]
+                    },
+                    {
+                        "id": 7,
+                        "name": "Lags5",
+                        "percentage": 49,
+                        "children": None
                     }
                 ]  
             }

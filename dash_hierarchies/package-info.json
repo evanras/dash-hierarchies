@@ -2,7 +2,7 @@
   "name": "dash_hierarchies",
   "version": "0.0.1",
   "description": "Intuitively display hierarchical data structures",
-"repository": {
+  "repository": {
     "type": "git",
     "url": "git://github.com/evanras/dash-hierarchies.git"
   },
@@ -46,7 +46,7 @@
     "react-docgen": "^5.4.3",
     "react-dom": "^16.8.6",
     "style-loader": "^3.3.3",
-    "styled-jsx": "^3.2.1",
+    "styled-jsx": "^5.1.6",
     "webpack": "^5.84.1",
     "webpack-cli": "^5.1.1",
     "webpack-dev-server": "^4.15.0"
