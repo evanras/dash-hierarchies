@@ -1,5 +1,7 @@
 # AUTO GENERATED FILE - DO NOT EDIT
 
 export(SimpleHierarchy)
+export(TableHierarchy)
 export(simleHierarchy)
 export(simpleHierarchy)
+export(tableHierarchy)

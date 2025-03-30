@@ -94,7 +94,7 @@ const HierarchicalDataItem = ({
               {isExpanded ? openCaret : closedCaret}
             </button>
           ) : (
-            <div style={{ marginRight: '0.5em', width: '1.5em' }}></div> // Placeholder for alignment
+            <div style={{ marginRight: '0.5em', width: '1.2em' }}></div> 
           )}
           
           {/* Item Name */}
@@ -176,7 +176,7 @@ const HierarchicalDataItem = ({
  * @param {Object} props.colors - Colors for the progress bars
  * @param {string} props.colors.primary - Color for the filled portion of progress bars
  * @param {string} props.colors.background - Color for the unfilled portion of progress bars
- * @param {Object} props.style - Custom styles to apply to the container
+ * @param {Object} props.styles - Custom styles to apply to the container
  * @param {string} props.className - CSS class names to apply to the container
  * @param {string} props.selectedItem - Name of the currently selected item (for controlled component)
  * @param {Function} props.setProps - Dash callback to update props
@@ -187,7 +187,7 @@ const SimpleHierarchy = (props) => {
     id,
     data = [], 
     colors = { primary: "#7c3aed", background: "#e5e7eb" },
-    style = {},
+    styles = {},
     className = '',
     selectedItem = null,
     setProps
@@ -227,7 +227,7 @@ const SimpleHierarchy = (props) => {
         padding: '1em',
         border: '1px solid #e5e7eb',
         borderRadius: '0.25em',
-        ...style
+        ...styles
       }}
     >
       {data.map((item, index) => (
@@ -275,7 +275,7 @@ SimpleHierarchy.propTypes = {
   /**
    * Inline styles to apply to the outer div.
    */
-  style: PropTypes.object,
+  styles: PropTypes.object,
 
   /**
    * CSS class names to apply to the outer div.
@@ -302,7 +302,7 @@ SimpleHierarchy.propTypes = {
 SimpleHierarchy.defaultProps = {
   data: [],
   colors: { primary: "#7c3aed", background: "#e5e7eb" },
-  style: {},
+  styles: {},
   selectedItem: null
 };
 

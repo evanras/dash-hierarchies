@@ -48,6 +48,19 @@ data=[
         "name": "Events",
         "percentage": 68,
         "children": None
+    },
+    {
+        "id": 10,
+        "name": "Dates",
+        "percentage": 68,
+        "children": [
+            {
+                "id": 11,
+                "name": "Day of Week",
+                "percentage": 13,
+                "children": None
+            }
+        ]
     }
 ]
 
@@ -59,8 +72,8 @@ app.layout = html.Div([
             "primary": "#7c3aed",
             "background": "#e5e7eb"
         },
-        style={
-            "maxWidth": "600px"
+        styles={
+            "maxWidth": "900px", "height": "300px", "overflow": "scroll"
         }
     ),
     html.Div(id='selected-item-output')

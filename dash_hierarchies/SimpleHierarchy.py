@@ -23,7 +23,7 @@ and progress bars. It is designed to be used as a Dash component.
 @param {Object} props.colors - Colors for the progress bars
 @param {string} props.colors.primary - Color for the filled portion of progress bars
 @param {string} props.colors.background - Color for the unfilled portion of progress bars
-@param {Object} props.style - Custom styles to apply to the container
+@param {Object} props.styles - Custom styles to apply to the container
 @param {string} props.className - CSS class names to apply to the container
 @param {string} props.selectedItem - Name of the currently selected item (for controlled component)
 @param {Function} props.setProps - Dash callback to update props
@@ -62,7 +62,10 @@ Keyword arguments:
     Object representing the currently selected item (controlled
     component pattern). This will be updated when a row is clicked.
     Contains all properties of the selected item except the 'children'
-    array."""
+    array.
+
+- styles (dict; optional):
+    Inline styles to apply to the outer div."""
     _children_props = []
     _base_nodes = ['children']
     _namespace = 'dash_hierarchies'
@@ -90,14 +93,14 @@ Keyword arguments:
         id: typing.Optional[typing.Union[str, dict]] = None,
         data: typing.Optional[typing.Sequence["Data"]] = None,
         colors: typing.Optional["Colors"] = None,
-        style: typing.Optional[typing.Any] = None,
+        styles: typing.Optional[dict] = None,
         className: typing.Optional[str] = None,
         selectedItem: typing.Optional[dict] = None,
         **kwargs
     ):
-        self._prop_names = ['id', 'className', 'colors', 'data', 'selectedItem', 'style']
+        self._prop_names = ['id', 'className', 'colors', 'data', 'selectedItem', 'styles']
         self._valid_wildcard_attributes =            []
-        self.available_properties = ['id', 'className', 'colors', 'data', 'selectedItem', 'style']
+        self.available_properties = ['id', 'className', 'colors', 'data', 'selectedItem', 'styles']
         self.available_wildcard_properties =            []
         _explicit_args = kwargs.pop('_explicit_args')
         _locals = locals()
