@@ -66,6 +66,16 @@ data = [
                         "children": None
                     }
                 ]
+            },
+            {
+                "Forecast Decomposition": "Something",
+                "January 2024": 6983.59,
+                "February 2024": 6450.23,
+                "March 2024": 7274.89,
+                "April 2024": 15966.18,
+                "May 2024": 6178.85,
+                "June 2024": 7167.62,
+                "children": None
             }
         ]
     }
