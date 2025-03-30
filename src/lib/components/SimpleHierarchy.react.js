@@ -11,6 +11,7 @@ import PropTypes from 'prop-types';
  * @param {React.ReactNode} props.openCaret - Icon to show when item is expanded
  * @param {React.ReactNode} props.closedCaret - Icon to show when item is collapsed
  * @param {Function} props.onRowClick - Callback function when row is clicked
+ * @param {Object} props.selectedItem - Currently selected item
  * @returns {React.ReactNode} - Rendered item with optional children
  */
 const HierarchicalDataItem = ({ 
@@ -19,18 +20,24 @@ const HierarchicalDataItem = ({
   colors, 
   openCaret, 
   closedCaret,
-  onRowClick
+  onRowClick,
+  selectedItem
 }) => {
   // Track expanded/collapsed state
   const [isExpanded, setIsExpanded] = useState(false);
   // Track hover state for visual feedback
   const [isHovered, setIsHovered] = useState(false);
+  // For click animation
+  const [isClicked, setIsClicked] = useState(false);
   
   // Determine if this item has children
   const hasChildren = item.children && item.children.length > 0;
   
   // Calculate indentation based on nesting level using em instead of px
   const indentPadding = `${level * 1}em`;
+  
+  // Check if this item is currently selected
+  const isSelected = selectedItem && selectedItem.name === item.name;
   
   // Toggle expanded state
   const toggleExpand = (e) => {
@@ -44,6 +51,10 @@ const HierarchicalDataItem = ({
   
   // Handle row click
   const handleRowClick = () => {
+    // Play click animation
+    setIsClicked(true);
+    setTimeout(() => setIsClicked(false), 200);
+    
     // Call the parent's click handler and pass the item data
     if (onRowClick) {
       onRowClick(item);
@@ -60,9 +71,11 @@ const HierarchicalDataItem = ({
           alignItems: 'center', 
           marginBottom: '0.25em',
           padding: '0.5em 0',
-          backgroundColor: isHovered ? '#f9fafb' : 'transparent',
+          backgroundColor: isSelected ? '#f0f0f0' : (isHovered ? '#f9fafb' : 'transparent'),
           borderRadius: '0.25em',
-          cursor: 'pointer'
+          cursor: 'pointer',
+          transition: 'all 0.1s ease',
+          transform: isClicked ? 'scale(0.99)' : 'scale(1)',
         }}
         onClick={handleRowClick}
         onMouseEnter={() => setIsHovered(true)}
@@ -72,7 +85,7 @@ const HierarchicalDataItem = ({
         <div style={{ 
           display: 'flex', 
           alignItems: 'center', 
-          paddingLeft: indentPadding 
+          paddingLeft: indentPadding
         }}>
           {hasChildren ? (
             <button 
@@ -100,7 +113,7 @@ const HierarchicalDataItem = ({
           {/* Item Name */}
           <div style={{ 
             flexGrow: 1, 
-            fontWeight: 500 
+            fontWeight: 500
           }}>
             {item.name}
           </div>
@@ -109,6 +122,7 @@ const HierarchicalDataItem = ({
         {/* Percentage Display */}
         <div style={{ 
           marginLeft: 'auto', 
+          marginRight: "0.5em",
           color: '#6b7280' 
         }}>
           {item.percentage}%
@@ -138,11 +152,19 @@ const HierarchicalDataItem = ({
               height: '100%', 
               borderRadius: '0.25em', 
               width: `${item.percentage}%`, 
-              backgroundColor: colors.primary 
+              backgroundColor: colors.primary
             }}
           ></div>
         </div>
       </div>
+
+      {/* Thin line separator between rows */}
+      <div style={{ 
+        width: "100%",
+        height: "1px",
+        backgroundColor: "#e0e0e0",
+        margin: "0.5em 0"
+      }} />
       
       {/* Render Children if Expanded */}
       {hasChildren && isExpanded && (
@@ -155,7 +177,8 @@ const HierarchicalDataItem = ({
               colors={colors}
               openCaret={openCaret}
               closedCaret={closedCaret}
-              onRowClick={onRowClick} // Pass down the onRowClick prop to children
+              onRowClick={onRowClick}
+              selectedItem={selectedItem}
             />
           ))}
         </div>
@@ -178,7 +201,7 @@ const HierarchicalDataItem = ({
  * @param {string} props.colors.background - Color for the unfilled portion of progress bars
  * @param {Object} props.styles - Custom styles to apply to the container
  * @param {string} props.className - CSS class names to apply to the container
- * @param {string} props.selectedItem - Name of the currently selected item (for controlled component)
+ * @param {Object} props.selectedItem - Currently selected item (for controlled component)
  * @param {Function} props.setProps - Dash callback to update props
  * @returns {React.ReactNode} - Rendered hierarchical data component
  */
@@ -238,6 +261,7 @@ const SimpleHierarchy = (props) => {
           openCaret={openCaret}
           closedCaret={closedCaret}
           onRowClick={handleRowClick}
+          selectedItem={selectedItem}
         />
       ))}
     </div>

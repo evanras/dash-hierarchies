@@ -124,7 +124,8 @@ const TableHierarchyRow = ({
                 width: column.width || 'auto',
                 backgroundColor: (hoveredColumn === column.name || selectedColumn?.name === column.name) 
                   ? '#f0f7ff' // Light blue highlight
-                  : 'transparent'
+                  : 'transparent',
+                transition: 'background-color 0.2s ease'
               }}
             >
               {item[column.name] !== undefined ? item[column.name] : ''}
@@ -202,24 +203,9 @@ const TableHierarchy = (props) => {
   
   // Track which column is being hovered over
   const [hoveredColumn, setHoveredColumn] = useState(null);
-
-  // Update table dimensions when window resizes
-  useEffect(() => {
-    const updateDimensions = () => {
-      // Any dimension update logic if needed
-    };
-
-    // Initial dimensions
-    updateDimensions();
-
-    // Add event listener
-    window.addEventListener('resize', updateDimensions);
-
-    // Clean up
-    return () => {
-      window.removeEventListener('resize', updateDimensions);
-    };
-  }, []);
+  
+  // Track column click animation
+  const [clickedColumn, setClickedColumn] = useState(null);
 
   // Add resize functionality after component mounts
   useEffect(() => {
@@ -255,8 +241,9 @@ const TableHierarchy = (props) => {
       indexCell.style.position = 'relative';
       indexCell.appendChild(resizer);
       
-      // Add mouse event listeners
-      let pageX, curColWidth, tableWidth;
+      // Track resize state and positions
+      let isResizing = false;
+      let startX, startWidth;
       
       // Show visual feedback on hover
       resizer.addEventListener('mouseover', () => {
@@ -271,11 +258,14 @@ const TableHierarchy = (props) => {
       resizer.addEventListener('mousedown', (e) => {
         // Prevent text selection during drag
         e.preventDefault();
+        e.stopPropagation();
         
-        // Get starting positions
-        pageX = e.pageX;
-        curColWidth = indexCell.offsetWidth;
-        tableWidth = table.offsetWidth;
+        // Set resizing state
+        isResizing = true;
+        
+        // Get initial positions and width
+        startX = e.clientX;
+        startWidth = indexCell.offsetWidth;
         
         // Add document-level event listeners
         document.addEventListener('mousemove', onMouseMove);
@@ -284,22 +274,29 @@ const TableHierarchy = (props) => {
       
       // Handle resizing
       const onMouseMove = (e) => {
-        // Calculate width change
-        const diffX = e.pageX - pageX;
+        if (!isResizing) return;
         
-        // Apply new width to the index column
-        const newWidth = Math.max(100, curColWidth + diffX); // Minimum 100px
-        indexCell.style.width = newWidth + 'px';
+        // Calculate width change
+        const diffX = e.clientX - startX;
+        const newWidth = Math.max(100, startWidth + diffX); // Minimum 100px
+        
+        // Apply new width to the index column header
+        indexCell.style.width = `${newWidth}px`;
         
         // Update all cells with .index-column class to match the new width
         const allIndexCells = table.querySelectorAll('.index-column');
         allIndexCells.forEach(cell => {
-          cell.style.width = newWidth + 'px';
+          cell.style.width = `${newWidth}px`;
         });
       };
       
       // End resizing
-      const onMouseUp = () => {
+      const onMouseUp = (e) => {
+        if (!isResizing) return;
+        
+        // Reset resizing state
+        isResizing = false;
+        
         // Remove document-level event listeners
         document.removeEventListener('mousemove', onMouseMove);
         document.removeEventListener('mouseup', onMouseUp);
@@ -373,38 +370,48 @@ const TableHierarchy = (props) => {
     }
   };
 
-  // Handle column header click
+  // Handle column header click with animation
   const handleColumnHeaderClick = (columnName) => {
-    if (setProps && columnName !== indexColumnName) {
-      // Gather all values in this column along with corresponding index values
-      const gatherColumnData = (items, columnName, indexColumnName, result = []) => {
-        items.forEach(item => {
-          if (item[columnName] !== undefined && item[indexColumnName] !== undefined) {
-            // Create a dictionary with index column name as key and column value
-            const rowData = {
-              [indexColumnName]: item[indexColumnName],
-              value: item[columnName]
-            };
-            result.push(rowData);
-          }
+    if (columnName !== indexColumnName) {
+      // Set clicked column for animation
+      setClickedColumn(columnName);
+      
+      // Reset after animation
+      setTimeout(() => {
+        setClickedColumn(null);
+      }, 200);
+      
+      if (setProps) {
+        // Gather all values in this column along with corresponding index values
+        const gatherColumnData = (items, columnName, indexColumnName, result = []) => {
+          items.forEach(item => {
+            if (item[columnName] !== undefined && item[indexColumnName] !== undefined) {
+              // Create a dictionary with index column name as key and column value
+              const rowData = {
+                [indexColumnName]: item[indexColumnName],
+                value: item[columnName]
+              };
+              result.push(rowData);
+            }
+            
+            if (item.children && item.children.length > 0) {
+              gatherColumnData(item.children, columnName, indexColumnName, result);
+            }
+          });
           
-          if (item.children && item.children.length > 0) {
-            gatherColumnData(item.children, columnName, indexColumnName, result);
+          return result;
+        };
+        
+        const columnData = gatherColumnData(data, columnName, indexColumnName);
+        
+        // Update the selectedColumn property in Dash
+        setProps({ 
+          selectedColumn: {
+            name: columnName,
+            data: columnData
           }
         });
-        
-        return result;
-      };
-      
-      const columnData = gatherColumnData(data, columnName, indexColumnName);
-      
-      // Update the selectedColumn property in Dash
-      setProps({ 
-        selectedColumn: {
-          name: columnName,
-          data: columnData
-        }
-      });
+      }
     }
   };
   
@@ -511,7 +518,9 @@ const TableHierarchy = (props) => {
                     cursor: column.name !== indexColumnName ? 'pointer' : 'default',
                     backgroundColor: (hoveredColumn === column.name || selectedColumn?.name === column.name) 
                       ? '#e1efff' // Slightly darker blue for header highlighting
-                      : 'white'
+                      : 'white',
+                    transition: 'all 0.2s ease',
+                    transform: clickedColumn === column.name ? 'scale(0.98)' : 'scale(1)',
                   }}
                   onClick={() => handleColumnHeaderClick(column.name)}
                   onMouseEnter={() => handleColumnHeaderHover(column.name)}
