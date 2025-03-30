@@ -1,0 +1,11 @@
+include dash_hierarchies/dash_hierarchies.min.js
+include dash_hierarchies/dash_hierarchies.min.js.map
+include dash_hierarchies/async-*.js
+include dash_hierarchies/async-*.js.map
+include dash_hierarchies/*-shared.js
+include dash_hierarchies/*-shared.js.map
+include dash_hierarchies/metadata.json
+include dash_hierarchies/package-info.json
+include README.md
+include LICENSE
+include package.json
