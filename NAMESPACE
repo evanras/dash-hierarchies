@@ -1,7 +1,9 @@
 # AUTO GENERATED FILE - DO NOT EDIT
 
+export(GenericTableHierarchy)
 export(SimpleHierarchy)
 export(TableHierarchy)
 export(simleHierarchy)
 export(simpleHierarchy)
 export(tableHierarchy)
+export(genericTableHierarchy)
