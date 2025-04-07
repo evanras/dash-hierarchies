@@ -137,6 +137,7 @@ const GenericTableHierarchyRow = ({
               style={{
                 padding: '8px 12px',
                 borderBottom: '1px solid #e5e7eb',
+                borderRight: '1px solid #e5e7eb',
                 textAlign: column.align || 'left',
                 ...(column.width ? { width: column.width } : {})
               }}
@@ -261,7 +262,10 @@ const GenericTableHierarchy = (props) => {
         style={{ 
           width: '100%',
           borderCollapse: 'collapse',
-          tableLayout: 'fixed'
+          tableLayout: 'fixed',
+          border: '1px solid #e5e7eb',
+          borderRight: 'none', // Prevents double borders
+          borderBottom: 'none' // Prevents double borders
         }}
       >
         <thead>
@@ -269,19 +273,28 @@ const GenericTableHierarchy = (props) => {
             {columns.map((column) => (
               <th 
                 key={column.name}
+                title={column.tooltipText || ''}
                 style={{
                   padding: '12px',
                   backgroundColor: '#f9fafb',
                   fontWeight: '600',
                   textAlign: column.align || 'left',
                   borderBottom: '2px solid #e5e7eb',
+                  borderRight: 'var(--is-last-column, 1px solid #e5e7eb)',
                   position: 'sticky',
                   top: 0,
                   zIndex: 1,
                   ...(column.width ? { width: column.width } : {})
                 }}
               >
-                {column.label || column.name}
+                <div style={{ 
+                  display: 'flex', 
+                  alignItems: 'center',
+                  justifyContent: column.align === 'right' ? 'flex-end' : 
+                                 column.align === 'center' ? 'center' : 'flex-start'
+                }}>
+                  {column.label || column.name}
+                </div>
               </th>
             ))}
           </tr>
@@ -347,7 +360,8 @@ GenericTableHierarchy.propTypes = {
     name: PropTypes.string.isRequired,
     label: PropTypes.string,
     width: PropTypes.string,
-    align: PropTypes.oneOf(['left', 'center', 'right'])
+    align: PropTypes.oneOf(['left', 'center', 'right']),
+    tooltipText: PropTypes.string
   })),
 
   /**

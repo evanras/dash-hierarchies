@@ -25,12 +25,13 @@ those elements have the following types:
   - hovercolor (character; optional)
   - selectedcolor (character; optional). Color configuration for hover and selected states.}
 
-\item{columns}{List of lists containing elements 'name', 'label', 'width', 'align'.
+\item{columns}{List of lists containing elements 'name', 'label', 'width', 'align', 'tooltiptext'.
 those elements have the following types:
   - name (character; required)
   - label (character; optional)
   - width (character; optional)
-  - align (a value equal to: 'left', 'center', 'right'; optional)s. Array of column definitions that specify which fields to display.
+  - align (a value equal to: 'left', 'center', 'right'; optional)
+  - tooltiptext (character; optional)s. Array of column definitions that specify which fields to display.
 Each column should have a name property, and can optionally have width, label, and align.
 Example: [{ name: 'title', label: 'Title', width: '200px', align: 'left' }]}
 

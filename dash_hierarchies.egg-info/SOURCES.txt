@@ -3,6 +3,7 @@ MANIFEST.in
 README.md
 package.json
 setup.py
+dash_hierarchies/GenericTableHierarchy.py
 dash_hierarchies/SimpleHierarchy.py
 dash_hierarchies/TableHierarchy.py
 dash_hierarchies/__init__.py
