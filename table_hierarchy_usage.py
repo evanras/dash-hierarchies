@@ -117,11 +117,13 @@ def display_selected_item(selected_item):
 
 @callback(
     Output('selected-column-output', 'children'),
-    Input('table-hierarchy-example', 'selectedColumn')
+    Input('table-hierarchy-example', 'selectedColumnHierarchy')
 )
 def display_selected_column(selected_column):
     if not selected_column:
         return "No column selected"
+    
+    print(selected_column)
     
     # Extract column name and data
     column_name = selected_column.get('name')

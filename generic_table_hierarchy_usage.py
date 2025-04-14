@@ -115,15 +115,21 @@ initial_data = [
     }
 ]
 
+initial_data = [{'ModelRank': 1, 'ModelName': 'CatBoostModelRegressionTimeSeries', 'ModelType': 'multivariate', 'MetricScore': None, 'BuildInfoID': 2, 'XperimentKernel': 38, 'children': [{'ModelRank': 1, 'ModelName': 'CatBoostModelRegressionTimeSeries', 'ModelType': 'multivariate', 'MetricScore': None, 'BuildInfoID': 1, 'XperimentKernel': 20}]}, {'ModelRank': 2, 'ModelName': 'XGBoostModelRegressionTimeSeries', 'ModelType': 'multivariate', 'MetricScore': None, 'BuildInfoID': 2, 'XperimentKernel': 39, 'children': [{'ModelRank': 3, 'ModelName': 'XGBoostModelRegressionTimeSeries', 'ModelType': 'multivariate', 'MetricScore': None, 'BuildInfoID': 1, 'XperimentKernel': 21}]}, {'ModelRank': 3, 'ModelName': 'RandomForestRegressionTimeSeries', 'ModelType': 'multivariate', 'MetricScore': None, 'BuildInfoID': 2, 'XperimentKernel': 37, 'children': [{'ModelRank': 2, 'ModelName': 'RandomForestRegressionTimeSeries', 'ModelType': 'multivariate', 'MetricScore': None, 'BuildInfoID': 1, 'XperimentKernel': 19}]}, {'ModelRank': 4, 'ModelName': 'PolyElasticNetModel', 'ModelType': 'multivariate', 'MetricScore': None, 'BuildInfoID': 2, 'XperimentKernel': 40, 'children': [{'ModelRank': 4, 'ModelName': 'PolyElasticNetModel', 'ModelType': 'multivariate', 'MetricScore': None, 'BuildInfoID': 1, 'XperimentKernel': 22}]}, {'ModelRank': 5, 'ModelName': 'MeanModelRegressionTimeSeries', 'ModelType': 'baseline', 'MetricScore': None, 'BuildInfoID': 2, 'XperimentKernel': 57, 'children': [{'ModelRank': 5, 'ModelName': 'MeanModelRegressionTimeSeries', 'ModelType': 'baseline', 'MetricScore': None, 'BuildInfoID': 1, 'XperimentKernel': 23}]}, {'ModelRank': 6, 'ModelName': 'LastValueNaiveModelRegressionTimeSeries', 'ModelType': 'baseline', 'MetricScore': None, 'BuildInfoID': 2, 'XperimentKernel': 59, 'children': [{'ModelRank': 7, 'ModelName': 'LastValueNaiveModelRegressionTimeSeries', 'ModelType': 'baseline', 'MetricScore': None, 'BuildInfoID': 1, 'XperimentKernel': 36}]}, {'ModelRank': 7, 'ModelName': 'ShiftModel', 'ModelType': 'baseline', 'MetricScore': None, 'BuildInfoID': 2, 'XperimentKernel': 41, 'children': [{'ModelRank': 6, 'ModelName': 'ShiftModel', 'ModelType': 'baseline', 'MetricScore': None, 'BuildInfoID': 1, 'XperimentKernel': 24}]}]
+
 app.layout = html.Div([
     dh.GenericTableHierarchy(
         id='table',
         data=initial_data,
         columns=[
-            {"name": "name", "label": "Category", "tooltipText": "LOOK AT ME"},
-            {"name": "value", "label": "Value ($)", "align": "center"},
-            {"name": "extra", "label": "NOICE"}
+            {"name": "ModelRank", "label": "ModelRank", "tooltipText": "LOOK AT ME", "width": "100%"},
+            {"name": "ModelName", "ModelName": "Value ($)", "align": "center", "width": "100%"},
+            {"name": "ModelType", "ModelType": "NOICE", "width": "100%"},
+            {"name": "XperimentKernel", "XperimentKernel": "NOICE", "width": "1em"},
         ],
+        highlightKey="XperimentKernel",
+        dataKey="XperimentKernel",
+        uniqueKey="XperimentKernel",
         style={"max-width": "75%"}
     ),
     html.Div(id='selection-info'),
@@ -132,12 +138,12 @@ app.layout = html.Div([
 ])
 
 # Enable/disable remove button based on selection
-@callback(
-    Output('remove-button', 'disabled'),
-    Input('table', 'selectedRow')
-)
-def update_button_state(selected_row):
-    return selected_row is None
+# @callback(
+#     Output('remove-button', 'disabled'),
+#     Input('table', 'selectedRow')
+# )
+# def update_button_state(selected_row):
+#     return selected_row is None
 
 # Display selection info
 @callback(
@@ -149,68 +155,69 @@ def show_selection(selected_row):
         return "No selection"
     
     return html.Div([
-        html.H4(f"Selected: {selected_row['name']}"),
+        html.H4(f"Selected: {selected_row['ModelName']}"),
         html.Pre(json.dumps(selected_row, indent=2))
     ])
 
-# Add new subcategory to first category
-@callback(
-    Output('table', 'data'),
-    Input('add-button', 'n_clicks'),
-    State('table', 'data'),
-    prevent_initial_call=True
-)
-def add_subcategory(n_clicks, data):
-    if not n_clicks:
-        return data
+# # Add new subcategory to first category
+# @callback(
+#     Output('table', 'data'),
+#     Input('add-button', 'n_clicks'),
+#     State('table', 'data'),
+#     prevent_initial_call=True
+# )
+# def add_subcategory(n_clicks, data):
+#     if not n_clicks:
+#         return data
     
-    # Create a deep copy to avoid modifying the original
-    new_data = copy.deepcopy(data)
+#     # Create a deep copy to avoid modifying the original
+#     new_data = copy.deepcopy(data)
     
-    # Add new subcategory to the first category
-    if new_data and new_data[0].get('children') is not None:
-        new_id = f"1-{len(new_data[0]['children']) + 1}"
-        new_data[0]['children'].append({
-            "id": new_id,
-            "name": f"Subcategory A-{len(new_data[0]['children']) + 1}",
-            "value": 100
-        })
+#     # Add new subcategory to the first category
+#     if new_data and new_data[0].get('children') is not None:
+#         new_id = f"1-{len(new_data[0]['children']) + 1}"
+#         new_data[0]['children'].append({
+#             "id": new_id,
+#             "name": f"Subcategory A-{len(new_data[0]['children']) + 1}",
+#             "value": 100
+#         })
     
-    return new_data
+#     return new_data
 
-# Remove selected item
-@callback(
-    Output('table', 'data', allow_duplicate=True),
-    Output('table', 'selectedRow'),
-    Input('remove-button', 'n_clicks'),
-    State('table', 'data'),
-    State('table', 'selectedRow'),
-    prevent_initial_call=True
-)
-def remove_selected(n_clicks, data, selected_row):
-    if not n_clicks or not selected_row:
-        return data, selected_row
+# # Remove selected item
+# @callback(
+#     Output('table', 'data', allow_duplicate=True),
+#     Output('table', 'selectedRow'),
+#     Input('remove-button', 'n_clicks'),
+#     State('table', 'data'),
+#     State('table', 'selectedRow'),
+#     prevent_initial_call=True
+# )
+# def remove_selected(n_clicks, data, selected_row):
+#     if not n_clicks or not selected_row:
+#         return data, selected_row
     
-    # Create a deep copy
-    new_data = copy.deepcopy(data)
-    selected_id = selected_row.get('id')
+#     # Create a deep copy
+#     new_data = copy.deepcopy(data)
+#     selected_id = selected_row.get('id')
     
-    # Recursive function to remove item with matching ID
-    def remove_item(items, target_id):
-        for i, item in enumerate(items):
-            if item.get('id') == target_id:
-                items.pop(i)
-                return True
+#     # Recursive function to remove item with matching ID
+#     def remove_item(items, target_id):
+#         for i, item in enumerate(items):
+#             if item.get('id') == target_id:
+#                 items.pop(i)
+#                 return True
             
-            if 'children' in item and item['children']:
-                if remove_item(item['children'], target_id):
-                    return True
+#             if 'children' in item and item['children']:
+#                 if remove_item(item['children'], target_id):
+#                     return True
         
-        return False
+#         return False
     
-    remove_item(new_data, selected_id)
+#     remove_item(new_data, selected_id)
     
-    return new_data, None
+#     return new_data, None
+
 
 if __name__ == '__main__':
     app.run(debug=True)

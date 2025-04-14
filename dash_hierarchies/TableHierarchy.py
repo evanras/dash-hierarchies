@@ -32,6 +32,7 @@ This component displays hierarchical data in a table format with support for:
 @param {string} props.className - CSS class names to apply to the container
 @param {Object} props.selectedItem - Currently selected item (for controlled component)
 @param {Object} props.selectedColumn - Currently selected column (for controlled component)
+@param {Object} props.selectedColumnHierarchy - Currently selected column in hierarchical format
 @param {string} props.indexColumnWidth - The width of the index column 
 @param {Function} props.setProps - Dash callback to update props
 @returns {React.ReactNode} - Rendered hierarchical table component
@@ -79,6 +80,18 @@ Keyword arguments:
 
     - data (list of dicts; optional)
 
+- selectedColumnHierarchy (dict; optional):
+    Object representing the currently selected column in hierarchical
+    format. This preserves the original hierarchy of the data
+    structure. Each node contains the index column value, the selected
+    column value, and any children.
+
+    `selectedColumnHierarchy` is a dict with keys:
+
+    - name (string; optional)
+
+    - data (list; optional)
+
 - selectedItem (dict; optional):
     Object representing the currently selected item (controlled
     component pattern). This will be updated when a row is clicked.
@@ -104,6 +117,14 @@ Keyword arguments:
         }
     )
 
+    SelectedColumnHierarchy = TypedDict(
+        "SelectedColumnHierarchy",
+            {
+            "name": NotRequired[str],
+            "data": NotRequired[typing.Sequence]
+        }
+    )
+
     @_explicitize_args
     def __init__(
         self,
@@ -115,12 +136,13 @@ Keyword arguments:
         className: typing.Optional[str] = None,
         selectedItem: typing.Optional[dict] = None,
         selectedColumn: typing.Optional["SelectedColumn"] = None,
+        selectedColumnHierarchy: typing.Optional["SelectedColumnHierarchy"] = None,
         indexColumnWidth: typing.Optional[str] = None,
         **kwargs
     ):
-        self._prop_names = ['id', 'className', 'columns', 'data', 'indexColumnName', 'indexColumnWidth', 'selectedColumn', 'selectedItem', 'style']
+        self._prop_names = ['id', 'className', 'columns', 'data', 'indexColumnName', 'indexColumnWidth', 'selectedColumn', 'selectedColumnHierarchy', 'selectedItem', 'style']
         self._valid_wildcard_attributes =            []
-        self.available_properties = ['id', 'className', 'columns', 'data', 'indexColumnName', 'indexColumnWidth', 'selectedColumn', 'selectedItem', 'style']
+        self.available_properties = ['id', 'className', 'columns', 'data', 'indexColumnName', 'indexColumnWidth', 'selectedColumn', 'selectedColumnHierarchy', 'selectedItem', 'style']
         self.available_wildcard_properties =            []
         _explicit_args = kwargs.pop('_explicit_args')
         _locals = locals()

@@ -179,6 +179,7 @@ const TableHierarchyRow = ({
  * @param {string} props.className - CSS class names to apply to the container
  * @param {Object} props.selectedItem - Currently selected item (for controlled component)
  * @param {Object} props.selectedColumn - Currently selected column (for controlled component)
+ * @param {Object} props.selectedColumnHierarchy - Currently selected column in hierarchical format
  * @param {string} props.indexColumnWidth - The width of the index column 
  * @param {Function} props.setProps - Dash callback to update props
  * @returns {React.ReactNode} - Rendered hierarchical table component
@@ -193,6 +194,7 @@ const TableHierarchy = (props) => {
     className = '',
     selectedItem = null,
     selectedColumn = null,
+    selectedColumnHierarchy = null,
     indexColumnWidth = '200px',
     setProps
   } = props;
@@ -370,6 +372,24 @@ const TableHierarchy = (props) => {
     }
   };
 
+  // Build a hierarchical structure for the selected column maintaining the original hierarchy
+  const buildColumnHierarchy = (items, columnName) => {
+    return items.map(item => {
+      // Create a new node with the index column and selected column value
+      const node = {
+        [indexColumnName]: item[indexColumnName],
+        value: item[columnName] !== undefined ? item[columnName] : null
+      };
+      
+      // Recursively build children hierarchy if they exist
+      if (item.children && item.children.length > 0) {
+        node.children = buildColumnHierarchy(item.children, columnName);
+      }
+      
+      return node;
+    });
+  };
+
   // Handle column header click with animation
   const handleColumnHeaderClick = (columnName) => {
     if (columnName !== indexColumnName) {
@@ -382,7 +402,7 @@ const TableHierarchy = (props) => {
       }, 200);
       
       if (setProps) {
-        // Gather all values in this column along with corresponding index values
+        // For flat structure (existing selectedColumn)
         const gatherColumnData = (items, columnName, indexColumnName, result = []) => {
           items.forEach(item => {
             if (item[columnName] !== undefined && item[indexColumnName] !== undefined) {
@@ -402,13 +422,21 @@ const TableHierarchy = (props) => {
           return result;
         };
         
+        // For hierarchical structure (new selectedColumnHierarchy)
+        const hierarchicalData = buildColumnHierarchy(data, columnName);
+        
+        // Gather flat data (for backward compatibility)
         const columnData = gatherColumnData(data, columnName, indexColumnName);
         
-        // Update the selectedColumn property in Dash
+        // Update both selectedColumn (flat) and selectedColumnHierarchy (hierarchical) properties
         setProps({ 
           selectedColumn: {
             name: columnName,
             data: columnData
+          },
+          selectedColumnHierarchy: {
+            name: columnName,
+            data: hierarchicalData
           }
         });
       }
@@ -615,6 +643,16 @@ TableHierarchy.propTypes = {
   }),
 
   /**
+   * Object representing the currently selected column in hierarchical format.
+   * This preserves the original hierarchy of the data structure.
+   * Each node contains the index column value, the selected column value, and any children.
+   */
+  selectedColumnHierarchy: PropTypes.shape({
+    name: PropTypes.string,
+    data: PropTypes.array
+  }),
+
+  /**
    * Width of the index column (leftmost column).
    * Can be updated by the user via drag-to-resize.
    */
@@ -636,6 +674,7 @@ TableHierarchy.defaultProps = {
   style: {},
   selectedItem: null,
   selectedColumn: null,
+  selectedColumnHierarchy: null,
   indexColumnWidth: '200px'
 };
 
