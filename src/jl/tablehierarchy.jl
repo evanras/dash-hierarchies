@@ -26,6 +26,7 @@ This component displays hierarchical data in a table format with support for:
 @param {string} props.className - CSS class names to apply to the container
 @param {Object} props.selectedItem - Currently selected item (for controlled component)
 @param {Object} props.selectedColumn - Currently selected column (for controlled component)
+@param {Object} props.selectedColumnHierarchy - Currently selected column in hierarchical format
 @param {string} props.indexColumnWidth - The width of the index column 
 @param {Function} props.setProps - Dash callback to update props
 @returns {React.ReactNode} - Rendered hierarchical table component
@@ -50,13 +51,19 @@ Contains the column name and data which is an array of objects with the index co
 Those elements have the following types:
   - `name` (String; optional)
   - `data` (Array of Dicts; optional)
+- `selectedColumnHierarchy` (optional): Object representing the currently selected column in hierarchical format.
+This preserves the original hierarchy of the data structure.
+Each node contains the index column value, the selected column value, and any children.. selectedColumnHierarchy has the following type: lists containing elements 'name', 'data'.
+Those elements have the following types:
+  - `name` (String; optional)
+  - `data` (Array; optional)
 - `selectedItem` (Dict; optional): Object representing the currently selected item (controlled component pattern).
 This will be updated when a row is clicked.
 Contains all properties of the selected item except the 'children' array.
 - `style` (Dict; optional): Inline styles to apply to the outer div.
 """
 function tablehierarchy(; kwargs...)
-        available_props = Symbol[:id, :className, :columns, :data, :indexColumnName, :indexColumnWidth, :selectedColumn, :selectedItem, :style]
+        available_props = Symbol[:id, :className, :columns, :data, :indexColumnName, :indexColumnWidth, :selectedColumn, :selectedColumnHierarchy, :selectedItem, :style]
         wild_props = Symbol[]
         return Component("tablehierarchy", "TableHierarchy", "dash_hierarchies", available_props, wild_props; kwargs...)
 end
