@@ -123,9 +123,9 @@ app.layout = html.Div([
         data=initial_data,
         columns=[
             {"name": "ModelRank", "label": "ModelRank", "tooltipText": "LOOK AT ME", "width": "100%"},
-            {"name": "ModelName", "ModelName": "Value ($)", "align": "center", "width": "100%"},
-            {"name": "ModelType", "ModelType": "NOICE", "width": "100%"},
-            {"name": "XperimentKernel", "XperimentKernel": "NOICE", "width": "1em"},
+            {"name": "ModelName", "ModelName": "Value ($)", "align": "center", "width": "100%", "tooltipText": " AT ME"},
+            {"name": "ModelType", "ModelType": "NOICE", "width": "100%", "tooltipText": "got it"},
+            {"name": "XperimentKernel", "XperimentKernel": "NOICE", "width": "1em", "tooltipText": "yup"},
         ],
         highlightKey="XperimentKernel",
         dataKey="XperimentKernel",

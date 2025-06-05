@@ -220,8 +220,12 @@ const GenericTableHierarchy = (props) => {
   // State to track expanded rows
   const [expandedRows, setExpandedRows] = useState({});
   
-  // Reference to data for comparison
+  // Tooltip state
+  const [tooltip, setTooltip] = useState({ content: '', visible: false, x: 0, y: 0 });
+  
+  // References
   const prevDataRef = useRef();
+  const mouseFollowRef = useRef(false);
   
   // Reset expanded rows when data changes structure
   useEffect(() => {
@@ -238,12 +242,53 @@ const GenericTableHierarchy = (props) => {
     prevDataRef.current = data;
   }, [data]);
 
+  // Mouse following effect for tooltips
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      // Only update tooltip position if it's visible and we're in follow mode
+      if (tooltip.visible && mouseFollowRef.current) {
+        setTooltip(prev => ({
+          ...prev,
+          x: e.clientX + 10,
+          y: e.clientY + 10
+        }));
+      }
+    };
+
+    if (tooltip.visible) {
+      document.addEventListener('mousemove', handleMouseMove);
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, [tooltip.visible]);
+
   // Handle row click
   const handleRowClick = (item) => {
     if (setProps) {
       // Update the selectedRow property
       setProps({ selectedRow: { ...item } });
     }
+  };
+
+  // Tooltip handlers
+  const handleShowTooltip = (e, content) => {
+    if (content) {
+      // Enable mouse following
+      mouseFollowRef.current = true;
+      
+      // Position tooltip near cursor but slightly offset
+      const x = e.clientX + 10;
+      const y = e.clientY + 10;
+      setTooltip({ content, visible: true, x, y });
+    }
+  };
+
+  const handleHideTooltip = () => {
+    // Disable mouse following
+    mouseFollowRef.current = false;
+    setTooltip(prev => ({ ...prev, visible: false }));
   };
 
   return (
@@ -255,6 +300,7 @@ const GenericTableHierarchy = (props) => {
         overflow: 'auto',
         borderRadius: '4px',
         border: '1px solid #e5e7eb',
+        position: 'relative', // Important for tooltip positioning
         ...style
       }}
     >
@@ -273,7 +319,8 @@ const GenericTableHierarchy = (props) => {
             {columns.map((column) => (
               <th 
                 key={column.name}
-                title={column.tooltipText || ''}
+                onMouseEnter={(e) => handleShowTooltip(e, column.tooltipText)}
+                onMouseLeave={handleHideTooltip}
                 style={{
                   padding: '12px',
                   backgroundColor: '#f9fafb',
@@ -332,6 +379,31 @@ const GenericTableHierarchy = (props) => {
           )}
         </tbody>
       </table>
+
+      {/* Custom Tooltip */}
+      {tooltip.visible && tooltip.content && (
+        <div
+          style={{
+            position: 'fixed',
+            left: `${tooltip.x}px`,
+            top: `${tooltip.y}px`,
+            backgroundColor: 'rgb(242, 241, 241)',
+            color: 'black',
+            padding: '4px 8px',
+            borderRadius: '0',
+            fontSize: '0.8rem',
+            pointerEvents: 'none',
+            zIndex: 1000,
+            whiteSpace: 'pre-line',
+            maxWidth: '300px',
+            wordWrap: 'break-word',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+            border: '1px solid #ccc'
+          }}
+        >
+          {tooltip.content}
+        </div>
+      )}
     </div>
   );
 };

@@ -1,13 +1,6 @@
 # AUTO GENERATED FILE - DO NOT EDIT
 
-import typing  # noqa: F401
-import numbers # noqa: F401
-from typing_extensions import TypedDict, NotRequired, Literal # noqa: F401
 from dash.development.base_component import Component, _explicitize_args
-try:
-    from dash.development.base_component import ComponentType # noqa: F401
-except ImportError:
-    ComponentType = typing.TypeVar("ComponentType", bound=Component)
 
 
 class TableHierarchy(Component):
@@ -96,50 +89,16 @@ Keyword arguments:
     Object representing the currently selected item (controlled
     component pattern). This will be updated when a row is clicked.
     Contains all properties of the selected item except the 'children'
-    array."""
+    array.
+
+- style (dict; optional):
+    Inline styles to apply to the outer div."""
     _children_props = []
     _base_nodes = ['children']
     _namespace = 'dash_hierarchies'
     _type = 'TableHierarchy'
-    Columns = TypedDict(
-        "Columns",
-            {
-            "name": str,
-            "width": NotRequired[str]
-        }
-    )
-
-    SelectedColumn = TypedDict(
-        "SelectedColumn",
-            {
-            "name": NotRequired[str],
-            "data": NotRequired[typing.Sequence[dict]]
-        }
-    )
-
-    SelectedColumnHierarchy = TypedDict(
-        "SelectedColumnHierarchy",
-            {
-            "name": NotRequired[str],
-            "data": NotRequired[typing.Sequence]
-        }
-    )
-
     @_explicitize_args
-    def __init__(
-        self,
-        id: typing.Optional[typing.Union[str, dict]] = None,
-        data: typing.Optional[typing.Sequence] = None,
-        columns: typing.Optional[typing.Sequence["Columns"]] = None,
-        indexColumnName: typing.Optional[str] = None,
-        style: typing.Optional[typing.Any] = None,
-        className: typing.Optional[str] = None,
-        selectedItem: typing.Optional[dict] = None,
-        selectedColumn: typing.Optional["SelectedColumn"] = None,
-        selectedColumnHierarchy: typing.Optional["SelectedColumnHierarchy"] = None,
-        indexColumnWidth: typing.Optional[str] = None,
-        **kwargs
-    ):
+    def __init__(self, id=Component.UNDEFINED, data=Component.UNDEFINED, columns=Component.UNDEFINED, indexColumnName=Component.REQUIRED, style=Component.UNDEFINED, className=Component.UNDEFINED, selectedItem=Component.UNDEFINED, selectedColumn=Component.UNDEFINED, selectedColumnHierarchy=Component.UNDEFINED, indexColumnWidth=Component.UNDEFINED, **kwargs):
         self._prop_names = ['id', 'className', 'columns', 'data', 'indexColumnName', 'indexColumnWidth', 'selectedColumn', 'selectedColumnHierarchy', 'selectedItem', 'style']
         self._valid_wildcard_attributes =            []
         self.available_properties = ['id', 'className', 'columns', 'data', 'indexColumnName', 'indexColumnWidth', 'selectedColumn', 'selectedColumnHierarchy', 'selectedItem', 'style']
