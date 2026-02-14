@@ -3,7 +3,7 @@ module DashHierarchies
 using Dash
 
 const resources_path = realpath(joinpath( @__DIR__, "..", "deps"))
-const version = "0.0.6"
+const version = "0.0.7"
 
 include("jl/generictablehierarchy.jl")
 include("jl/simplehierarchy.jl")
