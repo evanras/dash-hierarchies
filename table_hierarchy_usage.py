@@ -14,6 +14,15 @@ data = [
         "April 2024": 7416.90,
         "May 2024": 7664.13,
         "June 2024": 7416.90,
+        "July 2024": 110.3,
+        "August 2024": 111.3,
+        "September 2024": 112.3,
+        "October 2024": 113.3,
+        "November 2024": 114.3,
+        "December 2024": 115.3,
+        "January 2025": 116.3,
+        "February 2025": 117.3,
+        "March 2025": 118.3,
         "children": None
     },
     {
@@ -24,6 +33,15 @@ data = [
         "April 2024": 8549.28,
         "May 2024": -1485.28,
         "June 2024": -249.28,
+        "July 2024": 110.3,
+        "August 2024": 111.3,
+        "September 2024": 112.3,
+        "October 2024": 113.3,
+        "November 2024": 114.3,
+        "December 2024": 115.3,
+        "January 2025": 116.3,
+        "February 2025": 117.3,
+        "March 2025": 118.3,
         "children": [
             {
                 "Forecast Decomposition": "Some Child Item",
@@ -33,6 +51,15 @@ data = [
                 "April 2024": 3500.00,
                 "May 2024": -585.28,
                 "June 2024": -149.28,
+                "July 2024": 110.3,
+                "August 2024": 111.3,
+                "September 2024": 112.3,
+                "October 2024": 113.3,
+                "November 2024": 114.3,
+                "December 2024": 115.3,
+                "January 2025": 116.3,
+                "February 2025": 117.3,
+                "March 2025": 118.3,
                 "children": None
             }
         ]
@@ -45,6 +72,15 @@ data = [
         "April 2024": 15966.18,
         "May 2024": 6178.85,
         "June 2024": 7167.62,
+        "July 2024": 110.3,
+        "August 2024": 111.3,
+        "September 2024": 112.3,
+        "October 2024": 113.3,
+        "November 2024": 114.3,
+        "December 2024": 115.3,
+        "January 2025": 116.3,
+        "February 2025": 117.3,
+        "March 2025": 118.3,
         "children": [
             {
                 "Forecast Decomposition": "Forecast",
@@ -54,6 +90,15 @@ data = [
                 "April 2024": 15966.18,
                 "May 2024": 6178.85,
                 "June 2024": 7167.62,
+                "July 2024": 110.3,
+                "August 2024": 111.3,
+                "September 2024": 112.3,
+                "October 2024": 113.3,
+                "November 2024": 114.3,
+                "December 2024": 115.3,
+                "January 2025": 116.3,
+                "February 2025": 117.3,
+                "March 2025": 118.3,
                 "children": [
                     {
                         "Forecast Decomposition": "Forecast",
@@ -63,6 +108,15 @@ data = [
                         "April 2024": 15966.18,
                         "May 2024": 6178.85,
                         "June 2024": 7167.62,
+                        "July 2024": 110.3,
+                        "August 2024": 111.3,
+                        "September 2024": 112.3,
+                        "October 2024": 113.3,
+                        "November 2024": 114.3,
+                        "December 2024": 115.3,
+                        "January 2025": 116.3,
+                        "February 2025": 117.3,
+                        "March 2025": 118.3,
                         "children": None
                     }
                 ]
@@ -75,6 +129,15 @@ data = [
                 "April 2024": 15966.18,
                 "May 2024": 6178.85,
                 "June 2024": 7167.62,
+                "July 2024": 110.3,
+                "August 2024": 111.3,
+                "September 2024": 112.3,
+                "October 2024": 113.3,
+                "November 2024": 114.3,
+                "December 2024": 115.3,
+                "January 2025": 116.3,
+                "February 2025": 117.3,
+                "March 2025": 118.3,
                 "children": None
             }
         ]
@@ -89,14 +152,46 @@ columns = [
     {"name": "March 2024", "width": "150px"},
     {"name": "April 2024", "width": "150px"},
     {"name": "May 2024", "width": "150px"},
-    {"name": "June 2024", "width": "150px"}
+    {"name": "June 2024", "width": "150px"},
+    {"name": "July 2024", "width": "150px"},
+    {"name": "August 2024", "width": "150px"},
+    {"name": "September 2024", "width": "150px"},
+    {"name": "October 2024", "width": "150px"},
+    {"name": "November 2024", "width": "150px"},
+    {"name": "December 2024", "width": "150px"},
+    {"name": "January 2025", "width": "150px"},
+    {"name": "February 2025", "width": "150px"},
+    {"name": "March 2025", "width": "150px"},
 ]
+keys = [
+    "Forecast Decomposition",
+    "January 2024",
+    "February 2024", 
+    "March 2024",
+    "April 2024",
+    "May 2024",
+    "June 2024",
+    "July 2024",
+    "August 2024",
+    "September 2024",
+    "October 2024",
+    "November 2024",
+    "December 2024",
+    "January 2025",
+    "February 2025",
+    "March 2025"
+]
+cols = []
+for key in keys:
+    # cols.append({"name": key, "minWidth": "200px", "maxWidth": "300px", "width": "100%"})
+    # cols.append({"name": key, "width": "100%"})
+    cols.append({"name": key, "width": "200px"})
 
 app.layout = html.Div([
     dh.TableHierarchy(
         id='table-hierarchy-example',
         data=data,
-        columns=columns,
+        columns=cols,
         indexColumnName="Forecast Decomposition",
         style={"maxHeight": "400px"},
         indexColumnWidth='300px'

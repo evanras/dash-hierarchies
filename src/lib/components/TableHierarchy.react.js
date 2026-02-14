@@ -28,26 +28,29 @@ const TableHierarchyRow = ({
   cellStyles,
   hoveredColumn,
   selectedColumn,
+  selectedItem,
 }) => {
   // Track expanded/collapsed state
   const [isExpanded, setIsExpanded] = useState(false);
-  
+  // Focus state for keyboard
+  const [isFocused, setIsFocused] = useState(false);
+
   // Determine if this item has children
   const hasChildren = item.children && item.children.length > 0;
-  
+
   // Calculate indentation based on nesting level
   const indentPadding = `${level * 1}em`;
-  
+
   // Toggle expanded state
   const toggleExpand = (e) => {
     // Stop propagation to prevent row click handler from firing
     e.stopPropagation();
-    
+
     if (hasChildren) {
       setIsExpanded(!isExpanded);
     }
   };
-  
+
   // Handle row click
   const handleRowClick = () => {
     // Call the parent's click handler and pass the item data
@@ -59,14 +62,30 @@ const TableHierarchyRow = ({
   return (
     <>
       {/* Item Row */}
-      <tr 
-        style={{ 
-          cursor: 'pointer'
+      <tr
+        style={{
+          cursor: 'pointer',
+          backgroundColor: (selectedItem && selectedItem[indexColumnName] === item[indexColumnName]) ? '#e6f7ff' : 'transparent',
+          outline: isFocused ? '3px solid rgba(59,130,246,0.45)' : 'none',
+          outlineOffset: isFocused ? '2px' : '0',
+          transition: 'background-color 0.15s ease-in-out'
         }}
         onClick={handleRowClick}
+        onFocus={(e) => { if (e.target === e.currentTarget) setIsFocused(true); }}
+        onBlur={(e) => { if (e.target === e.currentTarget) setIsFocused(false); }}
+        onKeyDown={(e) => {
+          const key = e.key || e.keyCode;
+          if (key === 'Enter' || key === ' ' || key === 'Spacebar' || key === 13 || key === 32) {
+            e.preventDefault();
+            handleRowClick();
+          }
+        }}
+        tabIndex={0}
+        role="row"
+        aria-selected={selectedItem && selectedItem[indexColumnName] === item[indexColumnName]}
       >
         {/* Index Column with Indentation and Caret */}
-        <td 
+        <td
           className="index-column"
           style={{
             ...cellStyles,
@@ -78,18 +97,26 @@ const TableHierarchyRow = ({
             boxShadow: '2px 0 4px -2px rgba(0, 0, 0, 0.1)'
           }}
         >
-          <div style={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            paddingLeft: indentPadding 
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            paddingLeft: indentPadding
           }}>
             {hasChildren ? (
-              <button 
-                onClick={toggleExpand} 
-                style={{ 
-                  marginRight: '0.5em', 
-                  display: 'flex', 
-                  alignItems: 'center', 
+              <button
+                onClick={toggleExpand}
+                onKeyDown={(e) => {
+                  const key = e.key || e.keyCode;
+                  if (key === 'Enter' || key === ' ' || key === 'Spacebar' || key === 13 || key === 32) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    toggleExpand(e);
+                  }
+                }}
+                style={{
+                  marginRight: '0.5em',
+                  display: 'flex',
+                  alignItems: 'center',
                   justifyContent: 'center',
                   background: 'none',
                   border: 'none',
@@ -105,24 +132,24 @@ const TableHierarchyRow = ({
             ) : (
               <div style={{ marginRight: '0.2em', width: '1.5em' }}></div> // Placeholder for alignment
             )}
-            
+
             {/* Item Name */}
             <div style={{ fontWeight: 500 }}>
               {item[indexColumnName]}
             </div>
           </div>
         </td>
-        
+
         {/* Other Columns */}
         {columns
           .filter(col => col.name !== indexColumnName)
           .map((column) => (
-            <td 
-              key={column.name} 
+            <td
+              key={column.name}
               style={{
                 ...cellStyles,
                 width: column.width || 'auto',
-                backgroundColor: (hoveredColumn === column.name || selectedColumn?.name === column.name) 
+                backgroundColor: (hoveredColumn === column.name || selectedColumn?.name === column.name)
                   ? '#f0f7ff' // Light blue highlight
                   : 'transparent',
                 transition: 'background-color 0.2s ease'
@@ -133,7 +160,7 @@ const TableHierarchyRow = ({
           ))
         }
       </tr>
-      
+
       {/* Render Children if Expanded */}
       {hasChildren && isExpanded && (
         <>
@@ -150,6 +177,7 @@ const TableHierarchyRow = ({
               cellStyles={cellStyles}
               hoveredColumn={hoveredColumn}
               selectedColumn={selectedColumn}
+              selectedItem={selectedItem}
             />
           ))}
         </>
@@ -185,9 +213,9 @@ const TableHierarchyRow = ({
  * @returns {React.ReactNode} - Rendered hierarchical table component
  */
 const TableHierarchy = (props) => {
-  const { 
+  const {
     id,
-    data = [], 
+    data = [],
     columns = [],
     indexColumnName,
     style = {},
@@ -202,32 +230,32 @@ const TableHierarchy = (props) => {
   // Create a ref for the container div and table
   const containerRef = useRef(null);
   const tableRef = useRef(null);
-  
+
   // Track which column is being hovered over
   const [hoveredColumn, setHoveredColumn] = useState(null);
-  
+
   // Track column click animation
   const [clickedColumn, setClickedColumn] = useState(null);
 
   // Add resize functionality after component mounts
   useEffect(() => {
     if (!tableRef.current) return;
-    
+
     // Get the table element
     const table = tableRef.current;
-    
+
     // Function to make the first column resizable
     const makeIndexColumnResizable = () => {
       // Get the first row's first cell (index column header)
       const headerRow = table.querySelector('thead tr');
       if (!headerRow) return;
-      
+
       const indexCell = headerRow.children[0];
       if (!indexCell) return;
-      
+
       // Set initial width from prop
       indexCell.style.width = indexColumnWidth;
-      
+
       // Create resizer div
       const resizer = document.createElement('div');
       resizer.style.position = 'absolute';
@@ -238,112 +266,112 @@ const TableHierarchy = (props) => {
       resizer.style.cursor = 'col-resize';
       resizer.style.userSelect = 'none';
       resizer.style.zIndex = '10';
-      
+
       // Position the cell relatively for absolutely positioned resizer
       indexCell.style.position = 'relative';
       indexCell.appendChild(resizer);
-      
+
       // Track resize state and positions
       let isResizing = false;
       let startX, startWidth;
-      
+
       // Show visual feedback on hover
       resizer.addEventListener('mouseover', () => {
         resizer.style.borderRight = '2px solid #0000ff';
       });
-      
+
       resizer.addEventListener('mouseout', () => {
         resizer.style.borderRight = '';
       });
-      
+
       // Start resizing
       resizer.addEventListener('mousedown', (e) => {
         // Prevent text selection during drag
         e.preventDefault();
         e.stopPropagation();
-        
+
         // Set resizing state
         isResizing = true;
-        
+
         // Get initial positions and width
         startX = e.clientX;
         startWidth = indexCell.offsetWidth;
-        
+
         // Add document-level event listeners
         document.addEventListener('mousemove', onMouseMove);
         document.addEventListener('mouseup', onMouseUp);
       });
-      
+
       // Handle resizing
       const onMouseMove = (e) => {
         if (!isResizing) return;
-        
+
         // Calculate width change
         const diffX = e.clientX - startX;
         const newWidth = Math.max(100, startWidth + diffX); // Minimum 100px
-        
+
         // Apply new width to the index column header
         indexCell.style.width = `${newWidth}px`;
-        
+
         // Update all cells with .index-column class to match the new width
         const allIndexCells = table.querySelectorAll('.index-column');
         allIndexCells.forEach(cell => {
           cell.style.width = `${newWidth}px`;
         });
       };
-      
+
       // End resizing
       const onMouseUp = (e) => {
         if (!isResizing) return;
-        
+
         // Reset resizing state
         isResizing = false;
-        
+
         // Remove document-level event listeners
         document.removeEventListener('mousemove', onMouseMove);
         document.removeEventListener('mouseup', onMouseUp);
-        
+
         // Get final width
         const finalWidth = indexCell.offsetWidth + 'px';
-        
+
         // Update the prop via setProps if available
         if (setProps) {
           setProps({ indexColumnWidth: finalWidth });
         }
       };
     };
-    
+
     // Initialize resizable functionality
     makeIndexColumnResizable();
-    
+
     // Function to enforce sticky positioning
     const enforceStickyPositioning = () => {
       const container = containerRef.current;
       if (!container) return;
-      
+
       // Ensure the index header and cells stay sticky when scrolling horizontally
       container.addEventListener('scroll', () => {
         const indexHeader = table.querySelector('thead th.index-column');
         const indexCells = table.querySelectorAll('tbody td.index-column');
-        
+
         if (indexHeader) {
           indexHeader.style.left = `${container.scrollLeft}px`;
         }
-        
+
         indexCells.forEach(cell => {
           cell.style.left = `${container.scrollLeft}px`;
         });
       });
     };
-    
+
     // Initialize sticky positioning
     enforceStickyPositioning();
-    
+
     // Clean up any event listeners if component unmounts
     return () => {
       const container = containerRef.current;
       if (container) {
-        container.removeEventListener('scroll', () => {});
+        container.removeEventListener('scroll', () => { });
       }
     };
   }, [tableRef.current, containerRef.current, indexColumnWidth]);
@@ -351,13 +379,13 @@ const TableHierarchy = (props) => {
   // Define SVG for carets to avoid external dependencies
   const openCaret = (
     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="m6 9 6 6 6-6"/>
+      <path d="m6 9 6 6 6-6" />
     </svg>
   );
-  
+
   const closedCaret = (
     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="m9 18 6-6-6-6"/>
+      <path d="m9 18 6-6-6-6" />
     </svg>
   );
 
@@ -366,7 +394,7 @@ const TableHierarchy = (props) => {
     if (setProps) {
       // Create a copy of the item without the children property
       const { children, ...itemWithoutChildren } = item;
-      
+
       // Update the selectedItem property in Dash
       setProps({ selectedItem: itemWithoutChildren });
     }
@@ -380,12 +408,12 @@ const TableHierarchy = (props) => {
         [indexColumnName]: item[indexColumnName],
         value: item[columnName] !== undefined ? item[columnName] : null
       };
-      
+
       // Recursively build children hierarchy if they exist
       if (item.children && item.children.length > 0) {
         node.children = buildColumnHierarchy(item.children, columnName);
       }
-      
+
       return node;
     });
   };
@@ -395,12 +423,12 @@ const TableHierarchy = (props) => {
     if (columnName !== indexColumnName) {
       // Set clicked column for animation
       setClickedColumn(columnName);
-      
+
       // Reset after animation
       setTimeout(() => {
         setClickedColumn(null);
       }, 200);
-      
+
       if (setProps) {
         // For flat structure (existing selectedColumn)
         const gatherColumnData = (items, columnName, indexColumnName, result = []) => {
@@ -413,23 +441,23 @@ const TableHierarchy = (props) => {
               };
               result.push(rowData);
             }
-            
+
             if (item.children && item.children.length > 0) {
               gatherColumnData(item.children, columnName, indexColumnName, result);
             }
           });
-          
+
           return result;
         };
-        
+
         // For hierarchical structure (new selectedColumnHierarchy)
         const hierarchicalData = buildColumnHierarchy(data, columnName);
-        
+
         // Gather flat data (for backward compatibility)
         const columnData = gatherColumnData(data, columnName, indexColumnName);
-        
+
         // Update both selectedColumn (flat) and selectedColumnHierarchy (hierarchical) properties
-        setProps({ 
+        setProps({
           selectedColumn: {
             name: columnName,
             data: columnData
@@ -442,12 +470,12 @@ const TableHierarchy = (props) => {
       }
     }
   };
-  
+
   // Handle column header hover
   const handleColumnHeaderHover = (columnName) => {
     setHoveredColumn(columnName);
   };
-  
+
   // Handle column header hover end
   const handleColumnHeaderLeave = () => {
     setHoveredColumn(null);
@@ -485,9 +513,9 @@ const TableHierarchy = (props) => {
   `;
 
   return (
-    <div 
+    <div
       id={id}
-      className={className} 
+      className={className}
       ref={containerRef}
       style={{
         width: '100%',
@@ -503,12 +531,12 @@ const TableHierarchy = (props) => {
       <style>
         {stickyStyles}
       </style>
-      
-      <table 
+
+      <table
         ref={tableRef}
         className="resizable-table"
-        style={{ 
-          width: '100%', 
+        style={{
+          width: '100%',
           borderCollapse: 'separate',
           borderSpacing: 0,
           tableLayout: 'fixed'
@@ -517,7 +545,7 @@ const TableHierarchy = (props) => {
         <thead>
           <tr>
             {/* Index Column Header (Sticky) */}
-            <th 
+            <th
               className="index-column"
               style={{
                 ...headerCellStyles,
@@ -533,18 +561,20 @@ const TableHierarchy = (props) => {
               {indexColumnName}
               {/* Resize handle will be added by useEffect */}
             </th>
-            
+
             {/* Other Column Headers */}
             {columns
               .filter(col => col.name !== indexColumnName)
               .map((column) => (
-                <th 
+                <th
                   key={column.name}
+                  scope="col"
+                  tabIndex={column.name !== indexColumnName ? 0 : undefined}
                   style={{
                     ...headerCellStyles,
                     width: column.width || 'auto',
                     cursor: column.name !== indexColumnName ? 'pointer' : 'default',
-                    backgroundColor: (hoveredColumn === column.name || selectedColumn?.name === column.name) 
+                    backgroundColor: (hoveredColumn === column.name || selectedColumn?.name === column.name)
                       ? '#e1efff' // Slightly darker blue for header highlighting
                       : 'white',
                     transition: 'all 0.2s ease',
@@ -553,6 +583,15 @@ const TableHierarchy = (props) => {
                   onClick={() => handleColumnHeaderClick(column.name)}
                   onMouseEnter={() => handleColumnHeaderHover(column.name)}
                   onMouseLeave={handleColumnHeaderLeave}
+                  onFocus={() => handleColumnHeaderHover(column.name)}
+                  onBlur={handleColumnHeaderLeave}
+                  onKeyDown={(e) => {
+                    const key = e.key || e.keyCode;
+                    if (key === 'Enter' || key === ' ' || key === 'Spacebar' || key === 13 || key === 32) {
+                      e.preventDefault();
+                      handleColumnHeaderClick(column.name);
+                    }
+                  }}
                   title={column.name !== indexColumnName ? "Click to select column" : ""}
                 >
                   {column.name}
@@ -575,6 +614,7 @@ const TableHierarchy = (props) => {
               cellStyles={cellStyles}
               hoveredColumn={hoveredColumn}
               selectedColumn={selectedColumn}
+              selectedItem={selectedItem}
             />
           ))}
         </tbody>
