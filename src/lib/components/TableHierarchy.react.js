@@ -28,9 +28,12 @@ const TableHierarchyRow = ({
   cellStyles,
   hoveredColumn,
   selectedColumn,
+  selectedItem,
 }) => {
   // Track expanded/collapsed state
   const [isExpanded, setIsExpanded] = useState(false);
+  // Focus state for keyboard
+  const [isFocused, setIsFocused] = useState(false);
 
   // Determine if this item has children
   const hasChildren = item.children && item.children.length > 0;
@@ -61,9 +64,25 @@ const TableHierarchyRow = ({
       {/* Item Row */}
       <tr
         style={{
-          cursor: 'pointer'
+          cursor: 'pointer',
+          backgroundColor: (selectedItem && selectedItem[indexColumnName] === item[indexColumnName]) ? '#e6f7ff' : 'transparent',
+          outline: isFocused ? '3px solid rgba(59,130,246,0.45)' : 'none',
+          outlineOffset: isFocused ? '2px' : '0',
+          transition: 'background-color 0.15s ease-in-out'
         }}
         onClick={handleRowClick}
+        onFocus={(e) => { if (e.target === e.currentTarget) setIsFocused(true); }}
+        onBlur={(e) => { if (e.target === e.currentTarget) setIsFocused(false); }}
+        onKeyDown={(e) => {
+          const key = e.key || e.keyCode;
+          if (key === 'Enter' || key === ' ' || key === 'Spacebar' || key === 13 || key === 32) {
+            e.preventDefault();
+            handleRowClick();
+          }
+        }}
+        tabIndex={0}
+        role="row"
+        aria-selected={selectedItem && selectedItem[indexColumnName] === item[indexColumnName]}
       >
         {/* Index Column with Indentation and Caret */}
         <td
@@ -86,6 +105,14 @@ const TableHierarchyRow = ({
             {hasChildren ? (
               <button
                 onClick={toggleExpand}
+                onKeyDown={(e) => {
+                  const key = e.key || e.keyCode;
+                  if (key === 'Enter' || key === ' ' || key === 'Spacebar' || key === 13 || key === 32) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    toggleExpand(e);
+                  }
+                }}
                 style={{
                   marginRight: '0.5em',
                   display: 'flex',
@@ -150,6 +177,7 @@ const TableHierarchyRow = ({
               cellStyles={cellStyles}
               hoveredColumn={hoveredColumn}
               selectedColumn={selectedColumn}
+              selectedItem={selectedItem}
             />
           ))}
         </>
@@ -540,6 +568,8 @@ const TableHierarchy = (props) => {
               .map((column) => (
                 <th
                   key={column.name}
+                  scope="col"
+                  tabIndex={column.name !== indexColumnName ? 0 : undefined}
                   style={{
                     ...headerCellStyles,
                     width: column.width || 'auto',
@@ -553,6 +583,15 @@ const TableHierarchy = (props) => {
                   onClick={() => handleColumnHeaderClick(column.name)}
                   onMouseEnter={() => handleColumnHeaderHover(column.name)}
                   onMouseLeave={handleColumnHeaderLeave}
+                  onFocus={() => handleColumnHeaderHover(column.name)}
+                  onBlur={handleColumnHeaderLeave}
+                  onKeyDown={(e) => {
+                    const key = e.key || e.keyCode;
+                    if (key === 'Enter' || key === ' ' || key === 'Spacebar' || key === 13 || key === 32) {
+                      e.preventDefault();
+                      handleColumnHeaderClick(column.name);
+                    }
+                  }}
                   title={column.name !== indexColumnName ? "Click to select column" : ""}
                 >
                   {column.name}
@@ -575,6 +614,7 @@ const TableHierarchy = (props) => {
               cellStyles={cellStyles}
               hoveredColumn={hoveredColumn}
               selectedColumn={selectedColumn}
+              selectedItem={selectedItem}
             />
           ))}
         </tbody>
