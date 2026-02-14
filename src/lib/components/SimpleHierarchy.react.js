@@ -14,11 +14,11 @@ import PropTypes from 'prop-types';
  * @param {Object} props.selectedItem - Currently selected item
  * @returns {React.ReactNode} - Rendered item with optional children
  */
-const HierarchicalDataItem = ({ 
-  item, 
-  level = 0, 
-  colors, 
-  openCaret, 
+const HierarchicalDataItem = ({
+  item,
+  level = 0,
+  colors,
+  openCaret,
   closedCaret,
   onRowClick,
   selectedItem
@@ -29,32 +29,32 @@ const HierarchicalDataItem = ({
   const [isHovered, setIsHovered] = useState(false);
   // For click animation
   const [isClicked, setIsClicked] = useState(false);
-  
+
   // Determine if this item has children
   const hasChildren = item.children && item.children.length > 0;
-  
+
   // Calculate indentation based on nesting level using em instead of px
   const indentPadding = `${level * 1}em`;
-  
+
   // Check if this item is currently selected
   const isSelected = selectedItem && selectedItem.name === item.name;
-  
+
   // Toggle expanded state
   const toggleExpand = (e) => {
     // Stop propagation to prevent row click handler from firing
     e.stopPropagation();
-    
+
     if (hasChildren) {
       setIsExpanded(!isExpanded);
     }
   };
-  
+
   // Handle row click
   const handleRowClick = () => {
     // Play click animation
     setIsClicked(true);
     setTimeout(() => setIsClicked(false), 200);
-    
+
     // Call the parent's click handler and pass the item data
     if (onRowClick) {
       onRowClick(item);
@@ -64,11 +64,11 @@ const HierarchicalDataItem = ({
   return (
     <div style={{ width: '100%' }}>
       {/* Item Row */}
-      <div 
-        style={{ 
-          width: '100%', 
-          display: 'flex', 
-          alignItems: 'center', 
+      <div
+        style={{
+          width: '100%',
+          display: 'flex',
+          alignItems: 'center',
           marginBottom: '0.25em',
           padding: '0.5em 0',
           backgroundColor: isSelected ? '#f0f0f0' : (isHovered ? '#f9fafb' : 'transparent'),
@@ -82,18 +82,18 @@ const HierarchicalDataItem = ({
         onMouseLeave={() => setIsHovered(false)}
       >
         {/* Indentation and Toggle Button */}
-        <div style={{ 
-          display: 'flex', 
-          alignItems: 'center', 
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
           paddingLeft: indentPadding
         }}>
           {hasChildren ? (
-            <button 
-              onClick={toggleExpand} 
-              style={{ 
-                marginRight: '0.5em', 
-                display: 'flex', 
-                alignItems: 'center', 
+            <button
+              onClick={toggleExpand}
+              style={{
+                marginRight: '0.5em',
+                display: 'flex',
+                alignItems: 'center',
                 justifyContent: 'center',
                 background: 'none',
                 border: 'none',
@@ -107,51 +107,51 @@ const HierarchicalDataItem = ({
               {isExpanded ? openCaret : closedCaret}
             </button>
           ) : (
-            <div style={{ marginRight: '0.5em', width: '1.2em' }}></div> 
+            <div style={{ marginRight: '0.5em', width: '1.2em' }}></div>
           )}
-          
+
           {/* Item Name */}
-          <div style={{ 
-            flexGrow: 1, 
+          <div style={{
+            flexGrow: 1,
             fontWeight: 500
           }}>
             {item.name}
           </div>
         </div>
-        
+
         {/* Percentage Display */}
-        <div style={{ 
-          marginLeft: 'auto', 
+        <div style={{
+          marginLeft: 'auto',
           marginRight: "0.5em",
-          color: '#6b7280' 
+          color: '#6b7280'
         }}>
           {item.percentage}%
         </div>
       </div>
-      
+
       {/* Progress Bar - Now indented to match the text */}
       <div style={{ display: 'flex', width: '100%' }}>
         {/* This div creates the same indentation as the text */}
         <div style={{ width: indentPadding, flexShrink: 0 }}></div>
-        
+
         {/* Caret width equivalent space */}
         <div style={{ width: '1.5em', flexShrink: 0 }}></div>
-        
+
         {/* The actual progress bar */}
-        <div 
-          style={{ 
+        <div
+          style={{
             flex: 1,
-            height: '0.5em', 
-            borderRadius: '0.25em', 
-            marginBottom: '0.5em', 
-            backgroundColor: colors.background 
+            height: '0.5em',
+            borderRadius: '0.25em',
+            marginBottom: '0.5em',
+            backgroundColor: colors.background
           }}
         >
-          <div 
-            style={{ 
-              height: '100%', 
-              borderRadius: '0.25em', 
-              width: `${item.percentage}%`, 
+          <div
+            style={{
+              height: '100%',
+              borderRadius: '0.25em',
+              width: `${item.percentage}%`,
               backgroundColor: colors.primary
             }}
           ></div>
@@ -159,13 +159,13 @@ const HierarchicalDataItem = ({
       </div>
 
       {/* Thin line separator between rows */}
-      <div style={{ 
+      <div style={{
         width: "100%",
         height: "1px",
         backgroundColor: "#e0e0e0",
         margin: "0.5em 0"
       }} />
-      
+
       {/* Render Children if Expanded */}
       {hasChildren && isExpanded && (
         <div style={{ width: '100%' }}>
@@ -206,9 +206,9 @@ const HierarchicalDataItem = ({
  * @returns {React.ReactNode} - Rendered hierarchical data component
  */
 const SimpleHierarchy = (props) => {
-  const { 
+  const {
     id,
-    data = [], 
+    data = [],
     colors = { primary: "#7c3aed", background: "#e5e7eb" },
     styles = {},
     className = '',
@@ -220,13 +220,13 @@ const SimpleHierarchy = (props) => {
   // Now the openCaret points down (was pointing up before)
   const openCaret = (
     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="m6 9 6 6 6-6"/>
+      <path d="m6 9 6 6 6-6" />
     </svg>
   );
-  
+
   const closedCaret = (
     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="m9 18 6-6-6-6"/>
+      <path d="m9 18 6-6-6-6" />
     </svg>
   );
 
@@ -235,16 +235,16 @@ const SimpleHierarchy = (props) => {
     if (setProps) {
       // Create a copy of the item without the children property
       const { children, ...itemWithoutChildren } = item;
-      
+
       // Update the selectedItem property in Dash with the modified item
       setProps({ selectedItem: itemWithoutChildren });
     }
   };
 
   return (
-    <div 
+    <div
       id={id}
-      className={className} 
+      className={className}
       style={{
         width: '100%',
         padding: '1em',

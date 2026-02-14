@@ -1,13 +1,6 @@
 # AUTO GENERATED FILE - DO NOT EDIT
 
-import typing  # noqa: F401
-import numbers # noqa: F401
-from typing_extensions import TypedDict, NotRequired, Literal # noqa: F401
 from dash.development.base_component import Component, _explicitize_args
-try:
-    from dash.development.base_component import ComponentType # noqa: F401
-except ImportError:
-    ComponentType = typing.TypeVar("ComponentType", bound=Component)
 
 
 class GenericTableHierarchy(Component):
@@ -79,6 +72,9 @@ Keyword arguments:
 - selectedRow (dict; optional):
     Currently selected row data.
 
+- style (dict; optional):
+    Inline styles to apply to the container.
+
 - uniqueKey (string; default 'id'):
     Property name in data items to use as unique identifier. Default
     is 'id'."""
@@ -86,40 +82,8 @@ Keyword arguments:
     _base_nodes = ['children']
     _namespace = 'dash_hierarchies'
     _type = 'GenericTableHierarchy'
-    Columns = TypedDict(
-        "Columns",
-            {
-            "name": str,
-            "label": NotRequired[str],
-            "width": NotRequired[str],
-            "align": NotRequired[Literal["left", "center", "right"]],
-            "tooltipText": NotRequired[str]
-        }
-    )
-
-    Colors = TypedDict(
-        "Colors",
-            {
-            "hoverColor": NotRequired[str],
-            "selectedColor": NotRequired[str]
-        }
-    )
-
     @_explicitize_args
-    def __init__(
-        self,
-        id: typing.Optional[typing.Union[str, dict]] = None,
-        data: typing.Optional[typing.Sequence] = None,
-        columns: typing.Optional[typing.Sequence["Columns"]] = None,
-        colors: typing.Optional["Colors"] = None,
-        uniqueKey: typing.Optional[str] = None,
-        selectedRow: typing.Optional[dict] = None,
-        dataKey: typing.Optional[str] = None,
-        highlightKey: typing.Optional[str] = None,
-        style: typing.Optional[typing.Any] = None,
-        className: typing.Optional[str] = None,
-        **kwargs
-    ):
+    def __init__(self, id=Component.UNDEFINED, data=Component.UNDEFINED, columns=Component.UNDEFINED, colors=Component.UNDEFINED, uniqueKey=Component.UNDEFINED, selectedRow=Component.UNDEFINED, dataKey=Component.UNDEFINED, highlightKey=Component.UNDEFINED, style=Component.UNDEFINED, className=Component.UNDEFINED, **kwargs):
         self._prop_names = ['id', 'className', 'colors', 'columns', 'data', 'dataKey', 'highlightKey', 'selectedRow', 'style', 'uniqueKey']
         self._valid_wildcard_attributes =            []
         self.available_properties = ['id', 'className', 'colors', 'columns', 'data', 'dataKey', 'highlightKey', 'selectedRow', 'style', 'uniqueKey']

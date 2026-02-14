@@ -33,23 +33,25 @@ const GenericTableHierarchyRow = ({
 }) => {
   // State for hover effect
   const [isHovered, setIsHovered] = useState(false);
-  
+  // State for focus effect (keyboard)
+  const [isFocused, setIsFocused] = useState(false);
+
   // Determine if this item has children
   const hasChildren = item.children && item.children.length > 0;
-  
+
   // Calculate indentation based on nesting level
   const indentPadding = `${level * 20}px`;
-  
+
   // Generate a unique identifier for this row
   const rowId = item[uniqueKey] || `row-${level}-${JSON.stringify(item).slice(0, 20)}`;
-  
+
   // Check if this row is currently expanded
   const isExpanded = expandedRows[rowId] || false;
-  
+
   // Toggle expanded state
   const toggleExpand = (e) => {
     e.stopPropagation(); // Prevent row selection when clicking the toggle button
-    
+
     if (hasChildren) {
       // Update the expanded rows map
       setExpandedRows(prev => {
@@ -63,29 +65,46 @@ const GenericTableHierarchyRow = ({
       });
     }
   };
-  
+
   // Handle row click
   const handleRowClick = () => {
     if (onRowClick) {
       onRowClick(item);
     }
   };
-  
+
+  // Handle keyboard activation (Enter / Space)
+  const handleKeyDown = (e) => {
+    const key = e.key || e.keyCode;
+    if (key === 'Enter' || key === ' ' || key === 'Spacebar' || key === 13 || key === 32) {
+      e.preventDefault();
+      handleRowClick();
+    }
+  };
+
   // Determine if this row is selected
-  const isSelected = selectedRow && 
-    (selectedRow[dataKey] === item[dataKey] || 
-    (highlightKey && selectedRow[highlightKey] === item[highlightKey]));
-  
+  const isSelected = selectedRow &&
+    (selectedRow[dataKey] === item[dataKey] ||
+      (highlightKey && selectedRow[highlightKey] === item[highlightKey]));
+
   // Function to render caret for expandable rows
   const renderCaret = () => {
     if (!hasChildren) {
       // Empty space for alignment
       return <span style={{ width: '20px', display: 'inline-block' }}></span>;
     }
-    
+
     return (
       <button
         onClick={toggleExpand}
+        onKeyDown={(e) => {
+          const key = e.key || e.keyCode;
+          if (key === 'Enter' || key === ' ' || key === 'Spacebar' || key === 13 || key === 32) {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleExpand(e);
+          }
+        }}
         aria-expanded={isExpanded}
         aria-label={isExpanded ? "Collapse" : "Expand"}
         style={{
@@ -102,11 +121,11 @@ const GenericTableHierarchyRow = ({
       >
         {isExpanded ? (
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="m6 9 6 6 6-6"/>
+            <path d="m6 9 6 6 6-6" />
           </svg>
         ) : (
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="m9 18 6-6-6-6"/>
+            <path d="m9 18 6-6-6-6" />
           </svg>
         )}
       </button>
@@ -116,13 +135,21 @@ const GenericTableHierarchyRow = ({
   return (
     <>
       {/* Item Row */}
-      <tr 
+      <tr
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         onClick={handleRowClick}
-        style={{ 
+        onFocus={(e) => { if (e.target === e.currentTarget) setIsFocused(true); }}
+        onBlur={(e) => { if (e.target === e.currentTarget) setIsFocused(false); }}
+        onKeyDown={handleKeyDown}
+        tabIndex={0}
+        role="row"
+        aria-selected={isSelected}
+        style={{
           cursor: 'pointer',
           backgroundColor: isSelected ? colors.selectedColor : (isHovered ? colors.hoverColor : 'transparent'),
+          outline: isFocused ? '1px solid rgba(59,130,246,0.45)' : 'none',
+          outlineOffset: isFocused ? '2px' : '0',
           transition: 'background-color 0.15s ease-in-out'
         }}
       >
@@ -130,9 +157,9 @@ const GenericTableHierarchyRow = ({
         {columns.map((column, colIndex) => {
           const cellValue = item[column.name] !== undefined ? item[column.name] : '';
           const isFirstColumn = colIndex === 0;
-          
+
           return (
-            <td 
+            <td
               key={`${rowId}-${column.name}`}
               style={{
                 padding: '8px 12px',
@@ -143,10 +170,10 @@ const GenericTableHierarchyRow = ({
               }}
             >
               {isFirstColumn ? (
-                <div style={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  paddingLeft: indentPadding 
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  paddingLeft: indentPadding
                 }}>
                   {renderCaret()}
                   <span style={{ marginLeft: '8px' }}>{cellValue}</span>
@@ -158,7 +185,7 @@ const GenericTableHierarchyRow = ({
           );
         })}
       </tr>
-      
+
       {/* Render Children if Expanded */}
       {hasChildren && isExpanded && (
         <>
@@ -203,7 +230,7 @@ const GenericTableHierarchyRow = ({
  * @returns {React.ReactNode} - Rendered hierarchical table component
  */
 const GenericTableHierarchy = (props) => {
-  const { 
+  const {
     id,
     data = [],
     columns = [],
@@ -217,16 +244,19 @@ const GenericTableHierarchy = (props) => {
     setProps
   } = props;
 
+  // Tooltip element id for aria-describedby
+  const tooltipId = id ? `${id}-tooltip` : 'generic-table-tooltip';
+
   // State to track expanded rows
   const [expandedRows, setExpandedRows] = useState({});
-  
+
   // Tooltip state
   const [tooltip, setTooltip] = useState({ content: '', visible: false, x: 0, y: 0 });
-  
+
   // References
   const prevDataRef = useRef();
   const mouseFollowRef = useRef(false);
-  
+
   // Reset expanded rows when data changes structure
   useEffect(() => {
     // Skip on first render
@@ -237,7 +267,7 @@ const GenericTableHierarchy = (props) => {
         setExpandedRows({});
       }
     }
-    
+
     // Update the ref to current data
     prevDataRef.current = data;
   }, [data]);
@@ -277,10 +307,20 @@ const GenericTableHierarchy = (props) => {
     if (content) {
       // Enable mouse following
       mouseFollowRef.current = true;
-      
-      // Position tooltip near cursor but slightly offset
-      const x = e.clientX + 10;
-      const y = e.clientY + 10;
+
+      // Position tooltip near cursor but slightly offset. If invoked via keyboard focus,
+      // e.clientX may be undefined, so fall back to the element's bounding rect.
+      let x = 10;
+      let y = 10;
+      if (typeof e.clientX === 'number' && typeof e.clientY === 'number') {
+        x = e.clientX + 10;
+        y = e.clientY + 10;
+      } else if (e && e.target && e.target.getBoundingClientRect) {
+        const rect = e.target.getBoundingClientRect();
+        x = rect.left + 10;
+        y = rect.bottom + 4;
+      }
+
       setTooltip({ content, visible: true, x, y });
     }
   };
@@ -292,7 +332,7 @@ const GenericTableHierarchy = (props) => {
   };
 
   return (
-    <div 
+    <div
       id={id}
       className={className}
       style={{
@@ -304,8 +344,8 @@ const GenericTableHierarchy = (props) => {
         ...style
       }}
     >
-      <table 
-        style={{ 
+      <table
+        style={{
           width: '100%',
           borderCollapse: 'collapse',
           tableLayout: 'fixed',
@@ -317,10 +357,14 @@ const GenericTableHierarchy = (props) => {
         <thead>
           <tr>
             {columns.map((column) => (
-              <th 
+              <th
                 key={column.name}
+                scope="col"
                 onMouseEnter={(e) => handleShowTooltip(e, column.tooltipText)}
                 onMouseLeave={handleHideTooltip}
+                onFocus={(e) => handleShowTooltip(e, column.tooltipText)}
+                onBlur={handleHideTooltip}
+                aria-describedby={column.tooltipText ? tooltipId : undefined}
                 style={{
                   padding: '12px',
                   backgroundColor: '#f9fafb',
@@ -334,11 +378,11 @@ const GenericTableHierarchy = (props) => {
                   ...(column.width ? { width: column.width } : {})
                 }}
               >
-                <div style={{ 
-                  display: 'flex', 
+                <div style={{
+                  display: 'flex',
                   alignItems: 'center',
-                  justifyContent: column.align === 'right' ? 'flex-end' : 
-                                 column.align === 'center' ? 'center' : 'flex-start'
+                  justifyContent: column.align === 'right' ? 'flex-end' :
+                    column.align === 'center' ? 'center' : 'flex-start'
                 }}>
                   {column.label || column.name}
                 </div>
@@ -365,7 +409,7 @@ const GenericTableHierarchy = (props) => {
           ))}
           {data.length === 0 && (
             <tr>
-              <td 
+              <td
                 colSpan={columns.length}
                 style={{
                   padding: '16px',
@@ -383,6 +427,7 @@ const GenericTableHierarchy = (props) => {
       {/* Custom Tooltip */}
       {tooltip.visible && tooltip.content && (
         <div
+          id={tooltipId}
           style={{
             position: 'fixed',
             left: `${tooltip.x}px`,

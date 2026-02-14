@@ -1,6 +1,6 @@
-Metadata-Version: 2.4
+Metadata-Version: 2.2
 Name: dash_hierarchies
-Version: 0.0.4
+Version: 0.0.5
 Summary: Intuitively display hierarchical data structures
 Author: Evan Rasmussen <evanras@umich.edu>
 License: MIT
@@ -12,7 +12,6 @@ Dynamic: classifier
 Dynamic: description
 Dynamic: description-content-type
 Dynamic: license
-Dynamic: license-file
 Dynamic: summary
 
 # Dash Hierarchies
