@@ -29,6 +29,8 @@ const HierarchicalDataItem = ({
   const [isHovered, setIsHovered] = useState(false);
   // For click animation
   const [isClicked, setIsClicked] = useState(false);
+  // Focus state for keyboard
+  const [isFocused, setIsFocused] = useState(false);
 
   // Determine if this item has children
   const hasChildren = item.children && item.children.length > 0;
@@ -46,6 +48,15 @@ const HierarchicalDataItem = ({
 
     if (hasChildren) {
       setIsExpanded(!isExpanded);
+    }
+  };
+
+  // Handle keyboard activation (Enter / Space)
+  const handleKeyDown = (e) => {
+    const key = e.key || e.keyCode;
+    if (key === 'Enter' || key === ' ' || key === 'Spacebar' || key === 13 || key === 32) {
+      e.preventDefault();
+      handleRowClick();
     }
   };
 
@@ -76,10 +87,18 @@ const HierarchicalDataItem = ({
           cursor: 'pointer',
           transition: 'all 0.1s ease',
           transform: isClicked ? 'scale(0.99)' : 'scale(1)',
+          outline: isFocused ? '3px solid rgba(59,130,246,0.45)' : 'none',
+          outlineOffset: isFocused ? '2px' : '0',
         }}
         onClick={handleRowClick}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
+        onFocus={(e) => { if (e.target === e.currentTarget) setIsFocused(true); }}
+        onBlur={(e) => { if (e.target === e.currentTarget) setIsFocused(false); }}
+        onKeyDown={handleKeyDown}
+        tabIndex={0}
+        role="row"
+        aria-selected={isSelected}
       >
         {/* Indentation and Toggle Button */}
         <div style={{
@@ -90,6 +109,14 @@ const HierarchicalDataItem = ({
           {hasChildren ? (
             <button
               onClick={toggleExpand}
+              onKeyDown={(e) => {
+                const key = e.key || e.keyCode;
+                if (key === 'Enter' || key === ' ' || key === 'Spacebar' || key === 13 || key === 32) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  toggleExpand(e);
+                }
+              }}
               style={{
                 marginRight: '0.5em',
                 display: 'flex',
