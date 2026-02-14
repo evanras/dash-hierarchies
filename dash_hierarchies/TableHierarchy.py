@@ -1,6 +1,13 @@
 # AUTO GENERATED FILE - DO NOT EDIT
 
+import typing  # noqa: F401
+import numbers # noqa: F401
+from typing_extensions import TypedDict, NotRequired, Literal # noqa: F401
 from dash.development.base_component import Component, _explicitize_args
+try:
+    from dash.development.base_component import ComponentType # noqa: F401
+except ImportError:
+    ComponentType = typing.TypeVar("ComponentType", bound=Component)
 
 
 class TableHierarchy(Component):
@@ -41,13 +48,16 @@ Keyword arguments:
 - columns (list of dicts; optional):
     Array of column definitions. Each column should have a name and
     optional width property. Example: [{ name: 'Forecast
-    Decomposition', width: '250px' }, { name: 'January 2024' }].
+    Decomposition', width: '250px' }, { name: 'January 2024', align:
+    'right' }].
 
     `columns` is a list of dicts with keys:
 
     - name (string; required)
 
     - width (string; optional)
+
+    - align (a value equal to: 'left', 'center', 'right'; optional)
 
 - data (list; optional):
     The hierarchical data to display. Each item should have arbitrary
@@ -89,16 +99,51 @@ Keyword arguments:
     Object representing the currently selected item (controlled
     component pattern). This will be updated when a row is clicked.
     Contains all properties of the selected item except the 'children'
-    array.
-
-- style (dict; optional):
-    Inline styles to apply to the outer div."""
+    array."""
     _children_props = []
     _base_nodes = ['children']
     _namespace = 'dash_hierarchies'
     _type = 'TableHierarchy'
+    Columns = TypedDict(
+        "Columns",
+            {
+            "name": str,
+            "width": NotRequired[str],
+            "align": NotRequired[Literal["left", "center", "right"]]
+        }
+    )
+
+    SelectedColumn = TypedDict(
+        "SelectedColumn",
+            {
+            "name": NotRequired[str],
+            "data": NotRequired[typing.Sequence[dict]]
+        }
+    )
+
+    SelectedColumnHierarchy = TypedDict(
+        "SelectedColumnHierarchy",
+            {
+            "name": NotRequired[str],
+            "data": NotRequired[typing.Sequence]
+        }
+    )
+
     @_explicitize_args
-    def __init__(self, id=Component.UNDEFINED, data=Component.UNDEFINED, columns=Component.UNDEFINED, indexColumnName=Component.REQUIRED, style=Component.UNDEFINED, className=Component.UNDEFINED, selectedItem=Component.UNDEFINED, selectedColumn=Component.UNDEFINED, selectedColumnHierarchy=Component.UNDEFINED, indexColumnWidth=Component.UNDEFINED, **kwargs):
+    def __init__(
+        self,
+        id: typing.Optional[typing.Union[str, dict]] = None,
+        data: typing.Optional[typing.Sequence] = None,
+        columns: typing.Optional[typing.Sequence["Columns"]] = None,
+        indexColumnName: typing.Optional[str] = None,
+        style: typing.Optional[typing.Any] = None,
+        className: typing.Optional[str] = None,
+        selectedItem: typing.Optional[dict] = None,
+        selectedColumn: typing.Optional["SelectedColumn"] = None,
+        selectedColumnHierarchy: typing.Optional["SelectedColumnHierarchy"] = None,
+        indexColumnWidth: typing.Optional[str] = None,
+        **kwargs
+    ):
         self._prop_names = ['id', 'className', 'columns', 'data', 'indexColumnName', 'indexColumnWidth', 'selectedColumn', 'selectedColumnHierarchy', 'selectedItem', 'style']
         self._valid_wildcard_attributes =            []
         self.available_properties = ['id', 'className', 'columns', 'data', 'indexColumnName', 'indexColumnWidth', 'selectedColumn', 'selectedColumnHierarchy', 'selectedItem', 'style']

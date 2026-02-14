@@ -21,12 +21,13 @@ selectedItem=NULL, style=NULL)
 
 \item{className}{Character. CSS class names to apply to the outer div.}
 
-\item{columns}{List of lists containing elements 'name', 'width'.
+\item{columns}{List of lists containing elements 'name', 'width', 'align'.
 those elements have the following types:
   - name (character; required)
-  - width (character; optional)s. Array of column definitions.
+  - width (character; optional)
+  - align (a value equal to: 'left', 'center', 'right'; optional)s. Array of column definitions.
 Each column should have a name and optional width property.
-Example: [{ name: 'Forecast Decomposition', width: '250px' }, { name: 'January 2024' }]}
+Example: [{ name: 'Forecast Decomposition', width: '250px' }, { name: 'January 2024', align: 'right' }]}
 
 \item{data}{Unnamed list. The hierarchical data to display.
 Each item should have arbitrary columns and an optional children array.}

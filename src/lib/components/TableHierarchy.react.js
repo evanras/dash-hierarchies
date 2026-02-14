@@ -94,7 +94,8 @@ const TableHierarchyRow = ({
             backgroundColor: 'white',
             zIndex: 1,
             borderRight: '1px solid #e5e7eb',
-            boxShadow: '2px 0 4px -2px rgba(0, 0, 0, 0.1)'
+            boxShadow: '2px 0 4px -2px rgba(0, 0, 0, 0.1)',
+            textWrap: 'wrap',
           }}
         >
           <div style={{
@@ -152,7 +153,8 @@ const TableHierarchyRow = ({
                 backgroundColor: (hoveredColumn === column.name || selectedColumn?.name === column.name)
                   ? '#f0f7ff' // Light blue highlight
                   : 'transparent',
-                transition: 'background-color 0.2s ease'
+                transition: 'background-color 0.2s ease',
+                textAlign: column.align || 'left',
               }}
             >
               {item[column.name] !== undefined ? item[column.name] : ''}
@@ -400,7 +402,7 @@ const TableHierarchy = (props) => {
     }
   };
 
-  // Build a hierarchical structure for the selected column maintaining the original hierarchy
+  // Build a hierarchical structure for the selected column maintasining the original hierarchy
   const buildColumnHierarchy = (items, columnName) => {
     return items.map(item => {
       // Create a new node with the index column and selected column value
@@ -555,7 +557,7 @@ const TableHierarchy = (props) => {
                 backgroundColor: 'white',
                 borderRight: '1px solid #e5e7eb',
                 width: indexColumnWidth,
-                boxShadow: '2px 0 4px -2px rgba(0, 0, 0, 0.1)'
+                boxShadow: '2px 0 4px -2px rgba(0, 0, 0, 0.1)',
               }}
             >
               {indexColumnName}
@@ -579,6 +581,7 @@ const TableHierarchy = (props) => {
                       : 'white',
                     transition: 'all 0.2s ease',
                     transform: clickedColumn === column.name ? 'scale(0.98)' : 'scale(1)',
+                    textAlign: column.align || 'left',
                   }}
                   onClick={() => handleColumnHeaderClick(column.name)}
                   onMouseEnter={() => handleColumnHeaderHover(column.name)}
@@ -642,11 +645,12 @@ TableHierarchy.propTypes = {
   /**
    * Array of column definitions.
    * Each column should have a name and optional width property.
-   * Example: [{ name: 'Forecast Decomposition', width: '250px' }, { name: 'January 2024' }]
+   * Example: [{ name: 'Forecast Decomposition', width: '250px' }, { name: 'January 2024', align: 'right' }]
    */
   columns: PropTypes.arrayOf(PropTypes.shape({
     name: PropTypes.string.isRequired,
-    width: PropTypes.string
+    width: PropTypes.string,
+    align: PropTypes.oneOf(['left', 'center', 'right'])
   })),
 
   /**

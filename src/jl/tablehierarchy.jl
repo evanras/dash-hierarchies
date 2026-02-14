@@ -35,10 +35,11 @@ Keyword arguments:
 - `className` (String; optional): CSS class names to apply to the outer div.
 - `columns` (optional): Array of column definitions.
 Each column should have a name and optional width property.
-Example: [{ name: 'Forecast Decomposition', width: '250px' }, { name: 'January 2024' }]. columns has the following type: Array of lists containing elements 'name', 'width'.
+Example: [{ name: 'Forecast Decomposition', width: '250px' }, { name: 'January 2024', align: 'right' }]. columns has the following type: Array of lists containing elements 'name', 'width', 'align'.
 Those elements have the following types:
   - `name` (String; required)
-  - `width` (String; optional)s
+  - `width` (String; optional)
+  - `align` (a value equal to: 'left', 'center', 'right'; optional)s
 - `data` (Array; optional): The hierarchical data to display.
 Each item should have arbitrary columns and an optional children array.
 - `indexColumnName` (String; required): Name of the column to use as the index (leftmost column).
