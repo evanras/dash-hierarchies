@@ -185,7 +185,7 @@ cols = []
 for key in keys:
     # cols.append({"name": key, "minWidth": "200px", "maxWidth": "300px", "width": "100%"})
     # cols.append({"name": key, "width": "100%"})
-    cols.append({"name": key, "width": "200px"})
+    cols.append({"name": key, "width": "200px", "align": "right"})
 
 app.layout = html.Div([
     dh.TableHierarchy(
