@@ -14,4 +14,4 @@ This component is used to display hierarchical data in a tabular manner. Support
 
 https://github.com/user-attachments/assets/43f7926e-c393-40f8-a7c7-51fe0bb7c9fa
 
-[![Github All Releases](https://img.shields.io/github/downloads/evanras/dash-hierarchies/total.svg)]()
+[![PyPI Downloads](https://static.pepy.tech/personalized-badge/dash-hierarchies?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=GREEN&left_text=downloads)](https://pepy.tech/projects/dash-hierarchies)
