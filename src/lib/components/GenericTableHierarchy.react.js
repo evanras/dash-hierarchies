@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 /**
  * GenericTableHierarchyRow - Renders a single row in the hierarchical table
- * 
+ *
  * @param {Object} props - Component props
  * @param {Object} props.item - Row data containing optional children array and arbitrary data fields
  * @param {number} props.level - Current nesting level for indentation
@@ -16,6 +16,8 @@ import PropTypes from 'prop-types';
  * @param {string} props.highlightKey - Optional secondary key to check for highlighting
  * @param {Object} props.expandedRows - Map of expanded row IDs
  * @param {Function} props.setExpandedRows - Function to update expanded rows state
+ * @param {Function} props.onShowTooltip - Callback for showing tooltip
+ * @param {Function} props.onHideTooltip - Callback for hiding tooltip
  * @returns {React.ReactNode} - Rendered row with optional children
  */
 const GenericTableHierarchyRow = ({
@@ -29,7 +31,9 @@ const GenericTableHierarchyRow = ({
   dataKey,
   highlightKey,
   expandedRows,
-  setExpandedRows
+  setExpandedRows,
+  onShowTooltip,
+  onHideTooltip
 }) => {
   // State for hover effect
   const [isHovered, setIsHovered] = useState(false);
@@ -132,6 +136,46 @@ const GenericTableHierarchyRow = ({
     );
   };
 
+  // Function to render cell content based on column configuration
+  const renderCellContent = (column, cellValue, item) => {
+    // Determine content based on cellType
+    let content;
+    if (column.cellType === 'icons' && Array.isArray(cellValue)) {
+      const defaultIconStyle = { width: '16px', height: '16px' };
+      const defaultContainerStyle = { display: 'flex', alignItems: 'center', gap: '4px' };
+
+      content = (
+        <div style={{ ...defaultContainerStyle, ...column.iconContainerStyle }}>
+          {cellValue.map((iconSrc, idx) => (
+            <img
+              key={idx}
+              src={iconSrc}
+              alt=""
+              style={{ ...defaultIconStyle, ...column.iconStyle }}
+            />
+          ))}
+        </div>
+      );
+    } else {
+      content = cellValue;
+    }
+
+    // Wrap with tooltip handlers if cellTooltipColumn is defined
+    if (column.cellTooltipColumn && item[column.cellTooltipColumn]) {
+      return (
+        <span
+          onMouseEnter={(e) => onShowTooltip(e, item[column.cellTooltipColumn])}
+          onMouseLeave={onHideTooltip}
+          style={{ display: 'inline-block', width: '100%' }}
+        >
+          {content}
+        </span>
+      );
+    }
+
+    return content;
+  };
+
   return (
     <>
       {/* Item Row */}
@@ -176,10 +220,10 @@ const GenericTableHierarchyRow = ({
                   paddingLeft: indentPadding
                 }}>
                   {renderCaret()}
-                  <span style={{ marginLeft: '8px' }}>{cellValue}</span>
+                  <span style={{ marginLeft: '8px' }}>{renderCellContent(column, cellValue, item)}</span>
                 </div>
               ) : (
-                cellValue
+                renderCellContent(column, cellValue, item)
               )}
             </td>
           );
@@ -203,6 +247,8 @@ const GenericTableHierarchyRow = ({
               highlightKey={highlightKey}
               expandedRows={expandedRows}
               setExpandedRows={setExpandedRows}
+              onShowTooltip={onShowTooltip}
+              onHideTooltip={onHideTooltip}
             />
           ))}
         </>
@@ -405,6 +451,8 @@ const GenericTableHierarchy = (props) => {
               highlightKey={highlightKey}
               expandedRows={expandedRows}
               setExpandedRows={setExpandedRows}
+              onShowTooltip={handleShowTooltip}
+              onHideTooltip={handleHideTooltip}
             />
           ))}
           {data.length === 0 && (
@@ -478,7 +526,11 @@ GenericTableHierarchy.propTypes = {
     label: PropTypes.string,
     width: PropTypes.string,
     align: PropTypes.oneOf(['left', 'center', 'right']),
-    tooltipText: PropTypes.string
+    tooltipText: PropTypes.string,
+    cellType: PropTypes.oneOf(['text', 'icons']),
+    cellTooltipColumn: PropTypes.string,
+    iconStyle: PropTypes.object,
+    iconContainerStyle: PropTypes.object
   })),
 
   /**

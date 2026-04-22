@@ -79,58 +79,147 @@ import copy
 
 app = Dash(__name__)
 
-# Initial data
+# Data with cell-level icons and tooltips
+# Monitor field contains a list of icon URLs
+# MonitorTooltip field contains the tooltip text for that cell
 initial_data = [
     {
-        "id": "1",
-        "name": "Category A",
-        "value": 500,
-        "extra": "NOICE",
-        "children": [
+        'ModelRank': 1,
+        'ModelName': 'CatBoostModelRegressionTimeSeries',
+        'ModelType': 'multivariate',
+        'MetricScore': None,
+        'BuildInfoID': 2,
+        'XperimentKernel': 38,
+        'Monitor': ['/assets/info-circle-svgrepo-com.svg'],
+        'MonitorTooltip': 'Status: OK\nLast checked: 2 min ago',
+        'children': [
             {
-                "id": "1-1",
-                "name": "Subcategory A-1", 
-                "value": 200,
-                "extra": "NOICE",
-                "children": [
-                    {   
-                        "id": "1-1-1",
-                        "name": "Subcategory A-1-2", 
-                        "value": 454,
-                    }
-                ]
-            },
-            {"id": "1-2", "name": "Subcategory A-2", "value": 300}
+                'ModelRank': 1,
+                'ModelName': 'CatBoostModelRegressionTimeSeries',
+                'ModelType': 'multivariate',
+                'MetricScore': None,
+                'BuildInfoID': 1,
+                'XperimentKernel': 20,
+                'Monitor': ['/assets/info-circle-svgrepo-com.svg'],
+                'MonitorTooltip': 'Status: OK'
+            }
         ]
     },
     {
-        "id": "2",
-        "name": "Category B",
-        "value": 750,
-        "extra": "NOICE",
-        "children": [
-            {"id": "2-1", "name": "Subcategory B-1", "value": 400},
-            {"id": "2-2", "name": "Subcategory B-2", "value": 350}
+        'ModelRank': 2,
+        'ModelName': 'XGBoostModelRegressionTimeSeries',
+        'ModelType': 'multivariate',
+        'MetricScore': None,
+        'BuildInfoID': 2,
+        'XperimentKernel': 39,
+        'Monitor': ['/assets/warning-svgrepo-com.svg', '/assets/info-circle-svgrepo-com.svg'],
+        'MonitorTooltip': 'Warning: Memory usage high\nCPU: Normal',
+        'children': [
+            {
+                'ModelRank': 3,
+                'ModelName': 'XGBoostModelRegressionTimeSeries',
+                'ModelType': 'multivariate',
+                'MetricScore': None,
+                'BuildInfoID': 1,
+                'XperimentKernel': 21,
+                'Monitor': ['/assets/info-circle-svgrepo-com.svg'],
+                'MonitorTooltip': 'Status: OK'
+            }
+        ]
+    },
+    {
+        'ModelRank': 3,
+        'ModelName': 'RandomForestRegressionTimeSeries',
+        'ModelType': 'multivariate',
+        'MetricScore': None,
+        'BuildInfoID': 2,
+        'XperimentKernel': 37,
+        'Monitor': ['/assets/warning-svgrepo-com.svg'],
+        'MonitorTooltip': 'Warning: Slow training time',
+        'children': [
+            {
+                'ModelRank': 2,
+                'ModelName': 'RandomForestRegressionTimeSeries',
+                'ModelType': 'multivariate',
+                'MetricScore': None,
+                'BuildInfoID': 1,
+                'XperimentKernel': 19,
+                'Monitor': [],
+                'MonitorTooltip': None
+            }
+        ]
+    },
+    {
+        'ModelRank': 4,
+        'ModelName': 'PolyElasticNetModel',
+        'ModelType': 'multivariate',
+        'MetricScore': None,
+        'BuildInfoID': 2,
+        'XperimentKernel': 40,
+        'Monitor': ['/assets/info-circle-svgrepo-com.svg', '/assets/info-circle-svgrepo-com.svg'],
+        'MonitorTooltip': 'CPU: OK\nMemory: OK',
+        'children': [
+            {
+                'ModelRank': 4,
+                'ModelName': 'PolyElasticNetModel',
+                'ModelType': 'multivariate',
+                'MetricScore': None,
+                'BuildInfoID': 1,
+                'XperimentKernel': 22,
+                'Monitor': ['/assets/info-circle-svgrepo-com.svg'],
+                'MonitorTooltip': 'Status: OK'
+            }
+        ]
+    },
+    {
+        'ModelRank': 5,
+        'ModelName': 'MeanModelRegressionTimeSeries',
+        'ModelType': 'baseline',
+        'MetricScore': None,
+        'BuildInfoID': 2,
+        'XperimentKernel': 57,
+        'Monitor': [],
+        'MonitorTooltip': None,
+        'children': [
+            {
+                'ModelRank': 5,
+                'ModelName': 'MeanModelRegressionTimeSeries',
+                'ModelType': 'baseline',
+                'MetricScore': None,
+                'BuildInfoID': 1,
+                'XperimentKernel': 23,
+                'Monitor': [],
+                'MonitorTooltip': None
+            }
         ]
     }
 ]
-
-initial_data = [{'ModelRank': 1, 'ModelName': 'CatBoostModelRegressionTimeSeries', 'ModelType': 'multivariate', 'MetricScore': None, 'BuildInfoID': 2, 'XperimentKernel': 38, 'children': [{'ModelRank': 1, 'ModelName': 'CatBoostModelRegressionTimeSeries', 'ModelType': 'multivariate', 'MetricScore': None, 'BuildInfoID': 1, 'XperimentKernel': 20}]}, {'ModelRank': 2, 'ModelName': 'XGBoostModelRegressionTimeSeries', 'ModelType': 'multivariate', 'MetricScore': None, 'BuildInfoID': 2, 'XperimentKernel': 39, 'children': [{'ModelRank': 3, 'ModelName': 'XGBoostModelRegressionTimeSeries', 'ModelType': 'multivariate', 'MetricScore': None, 'BuildInfoID': 1, 'XperimentKernel': 21}]}, {'ModelRank': 3, 'ModelName': 'RandomForestRegressionTimeSeries', 'ModelType': 'multivariate', 'MetricScore': None, 'BuildInfoID': 2, 'XperimentKernel': 37, 'children': [{'ModelRank': 2, 'ModelName': 'RandomForestRegressionTimeSeries', 'ModelType': 'multivariate', 'MetricScore': None, 'BuildInfoID': 1, 'XperimentKernel': 19}]}, {'ModelRank': 4, 'ModelName': 'PolyElasticNetModel', 'ModelType': 'multivariate', 'MetricScore': None, 'BuildInfoID': 2, 'XperimentKernel': 40, 'children': [{'ModelRank': 4, 'ModelName': 'PolyElasticNetModel', 'ModelType': 'multivariate', 'MetricScore': None, 'BuildInfoID': 1, 'XperimentKernel': 22}]}, {'ModelRank': 5, 'ModelName': 'MeanModelRegressionTimeSeries', 'ModelType': 'baseline', 'MetricScore': None, 'BuildInfoID': 2, 'XperimentKernel': 57, 'children': [{'ModelRank': 5, 'ModelName': 'MeanModelRegressionTimeSeries', 'ModelType': 'baseline', 'MetricScore': None, 'BuildInfoID': 1, 'XperimentKernel': 23}]}, {'ModelRank': 6, 'ModelName': 'LastValueNaiveModelRegressionTimeSeries', 'ModelType': 'baseline', 'MetricScore': None, 'BuildInfoID': 2, 'XperimentKernel': 59, 'children': [{'ModelRank': 7, 'ModelName': 'LastValueNaiveModelRegressionTimeSeries', 'ModelType': 'baseline', 'MetricScore': None, 'BuildInfoID': 1, 'XperimentKernel': 36}]}, {'ModelRank': 7, 'ModelName': 'ShiftModel', 'ModelType': 'baseline', 'MetricScore': None, 'BuildInfoID': 2, 'XperimentKernel': 41, 'children': [{'ModelRank': 6, 'ModelName': 'ShiftModel', 'ModelType': 'baseline', 'MetricScore': None, 'BuildInfoID': 1, 'XperimentKernel': 24}]}]
 
 app.layout = html.Div([
     dh.GenericTableHierarchy(
         id='table',
         data=initial_data,
         columns=[
-            {"name": "ModelRank", "label": "ModelRank", "tooltipText": "LOOK AT ME", "width": "100%"},
-            {"name": "ModelName", "ModelName": "Value ($)", "align": "center", "width": "100%", "tooltipText": " AT ME"},
-            {"name": "ModelType", "ModelType": "NOICE", "width": "100%", "tooltipText": "got it"},
-            {"name": "XperimentKernel", "XperimentKernel": "NOICE", "width": "1em", "tooltipText": "yup"},
+            {"name": "ModelRank", "label": "Rank", "tooltipText": "Model ranking by performance", "width": "25px"},
+            {"name": "ModelName", "label": "Model Name", "width": "300px", "tooltipText": "Name of the model"},
+            {"name": "ModelType", "label": "Type", "width": "60px", "tooltipText": "Model type category"},
+            {
+                "name": "Monitor",
+                "label": "Status",
+                "cellType": "icons",
+                "cellTooltipColumn": "MonitorTooltip",
+                "iconStyle": {"width": "20px", "height": "20px"},
+                "iconContainerStyle": {"gap": "8px", "justifyContent": "center"},
+                "align": "center",
+                "width": "100px",
+                "tooltipText": "Monitoring status indicators"
+            },
+            {"name": "XperimentKernel", "label": "Kernel ID", "width": "100px", "tooltipText": "Experiment kernel identifier"},
         ],
         highlightKey="XperimentKernel",
         dataKey="XperimentKernel",
         uniqueKey="XperimentKernel",
-        style={"max-width": "75%"}
+        style={"maxWidth": "900px"}
     ),
     html.Div(id='selection-info'),
     html.Button('Add Subcategory', id='add-button'),
