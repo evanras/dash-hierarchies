@@ -14,3 +14,4 @@ This component is used to display hierarchical data in a tabular manner. Support
 
 https://github.com/user-attachments/assets/43f7926e-c393-40f8-a7c7-51fe0bb7c9fa
 
+[![Github All Releases](https://img.shields.io/github/downloads/evanras/dash-hierarchies/total.svg)]()
