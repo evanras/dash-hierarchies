@@ -31,13 +31,17 @@ Those elements have the following types:
   - `selectedColor` (String; optional)
 - `columns` (optional): Array of column definitions that specify which fields to display.
 Each column should have a name property, and can optionally have width, label, and align.
-Example: [{ name: 'title', label: 'Title', width: '200px', align: 'left' }]. columns has the following type: Array of lists containing elements 'name', 'label', 'width', 'align', 'tooltipText'.
+Example: [{ name: 'title', label: 'Title', width: '200px', align: 'left' }]. columns has the following type: Array of lists containing elements 'name', 'label', 'width', 'align', 'tooltipText', 'cellType', 'cellTooltipColumn', 'iconStyle', 'iconContainerStyle'.
 Those elements have the following types:
   - `name` (String; required)
   - `label` (String; optional)
   - `width` (String; optional)
   - `align` (a value equal to: 'left', 'center', 'right'; optional)
-  - `tooltipText` (String; optional)s
+  - `tooltipText` (String; optional)
+  - `cellType` (a value equal to: 'text', 'icons'; optional)
+  - `cellTooltipColumn` (String; optional)
+  - `iconStyle` (Dict; optional)
+  - `iconContainerStyle` (Dict; optional)s
 - `data` (Array; optional): The hierarchical data to display.
 Each item should have arbitrary properties and an optional children array.
 - `dataKey` (String; optional): Property name to use when comparing selected row with current row.
