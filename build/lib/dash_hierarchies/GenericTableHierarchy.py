@@ -64,6 +64,14 @@ Keyword arguments:
 
     - tooltipText (string; optional)
 
+    - cellType (a value equal to: 'text', 'icons'; optional)
+
+    - cellTooltipColumn (string; optional)
+
+    - iconStyle (dict; optional)
+
+    - iconContainerStyle (dict; optional)
+
 - data (list; optional):
     The hierarchical data to display. Each item should have arbitrary
     properties and an optional children array.
@@ -93,7 +101,11 @@ Keyword arguments:
             "label": NotRequired[str],
             "width": NotRequired[str],
             "align": NotRequired[Literal["left", "center", "right"]],
-            "tooltipText": NotRequired[str]
+            "tooltipText": NotRequired[str],
+            "cellType": NotRequired[Literal["text", "icons"]],
+            "cellTooltipColumn": NotRequired[str],
+            "iconStyle": NotRequired[dict],
+            "iconContainerStyle": NotRequired[dict]
         }
     )
 
