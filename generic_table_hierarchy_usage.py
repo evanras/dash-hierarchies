@@ -82,6 +82,7 @@ app = Dash(__name__)
 # Data with cell-level icons and tooltips
 # Monitor field contains a list of icon URLs
 # MonitorTooltip field contains the tooltip text for that cell
+# _rowStyle applies custom CSS styles to the entire row
 initial_data = [
     {
         'ModelRank': 1,
@@ -92,6 +93,7 @@ initial_data = [
         'XperimentKernel': 38,
         'Monitor': ['/assets/info-circle-svgrepo-com.svg'],
         'MonitorTooltip': 'Status: OK\nLast checked: 2 min ago',
+        '_rowStyle': {'fontWeight': 'bold'},  # Bold the top-ranked model
         'children': [
             {
                 'ModelRank': 1,
@@ -101,7 +103,8 @@ initial_data = [
                 'BuildInfoID': 1,
                 'XperimentKernel': 20,
                 'Monitor': ['/assets/info-circle-svgrepo-com.svg'],
-                'MonitorTooltip': 'Status: OK'
+                'MonitorTooltip': 'Status: OK',
+                '_rowStyle': {'background-color': 'lightgreen'}
             }
         ]
     },

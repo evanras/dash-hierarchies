@@ -176,6 +176,13 @@ const GenericTableHierarchyRow = ({
     return content;
   };
 
+  // Extract background color from _rowStyle (support both camelCase and hyphenated)
+  // and use it as the default instead of 'transparent'
+  const rowStyle = item._rowStyle || {};
+  const rowBackgroundColor = rowStyle.backgroundColor || rowStyle['background-color'] || 'transparent';
+  // Remove background properties from rowStyle so they don't conflict
+  const { backgroundColor: _bg, 'background-color': _bgAlt, ...restRowStyle } = rowStyle;
+
   return (
     <>
       {/* Item Row */}
@@ -191,10 +198,11 @@ const GenericTableHierarchyRow = ({
         aria-selected={isSelected}
         style={{
           cursor: 'pointer',
-          backgroundColor: isSelected ? colors.selectedColor : (isHovered ? colors.hoverColor : 'transparent'),
+          backgroundColor: isSelected ? colors.selectedColor : (isHovered ? colors.hoverColor : rowBackgroundColor),
           outline: isFocused ? '1px solid rgba(59,130,246,0.45)' : 'none',
           outlineOffset: isFocused ? '2px' : '0',
-          transition: 'background-color 0.15s ease-in-out'
+          transition: 'background-color 0.15s ease-in-out',
+          ...restRowStyle
         }}
       >
         {/* Column cells */}
