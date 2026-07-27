@@ -307,9 +307,29 @@ const GenericTableHierarchy = (props) => {
   // Tooltip state
   const [tooltip, setTooltip] = useState({ content: '', visible: false, x: 0, y: 0 });
 
+  // Tooltip DOM ref for measuring dimensions and clamping to viewport
+  const tooltipRef = useRef(null);
+
   // References
   const prevDataRef = useRef();
   const mouseFollowRef = useRef(false);
+
+  const clampTooltipPosition = (x, y) => {
+    if (typeof window === 'undefined') {
+      return { x, y };
+    }
+
+    const margin = 8;
+    const tooltipWidth = tooltipRef.current?.offsetWidth || 0;
+    const tooltipHeight = tooltipRef.current?.offsetHeight || 0;
+    const maxX = window.innerWidth - tooltipWidth - margin;
+    const maxY = window.innerHeight - tooltipHeight - margin;
+
+    return {
+      x: Math.min(Math.max(x, margin), Math.max(maxX, margin)),
+      y: Math.min(Math.max(y, margin), Math.max(maxY, margin))
+    };
+  };
 
   // Reset expanded rows when data changes structure
   useEffect(() => {
@@ -331,10 +351,11 @@ const GenericTableHierarchy = (props) => {
     const handleMouseMove = (e) => {
       // Only update tooltip position if it's visible and we're in follow mode
       if (tooltip.visible && mouseFollowRef.current) {
+        const { x, y } = clampTooltipPosition(e.clientX + 10, e.clientY + 10);
         setTooltip(prev => ({
           ...prev,
-          x: e.clientX + 10,
-          y: e.clientY + 10
+          x,
+          y
         }));
       }
     };
@@ -347,6 +368,26 @@ const GenericTableHierarchy = (props) => {
       document.removeEventListener('mousemove', handleMouseMove);
     };
   }, [tooltip.visible]);
+
+  useEffect(() => {
+    if (!tooltip.visible) {
+      return;
+    }
+
+    const clampAfterRender = () => {
+      if (!tooltipRef.current) {
+        return;
+      }
+
+      const { x, y } = clampTooltipPosition(tooltip.x, tooltip.y);
+      if (x !== tooltip.x || y !== tooltip.y) {
+        setTooltip(prev => ({ ...prev, x, y }));
+      }
+    };
+
+    const id = window.requestAnimationFrame(clampAfterRender);
+    return () => window.cancelAnimationFrame(id);
+  }, [tooltip.visible, tooltip.content, tooltip.x, tooltip.y]);
 
   // Handle row click
   const handleRowClick = (item) => {
@@ -375,7 +416,8 @@ const GenericTableHierarchy = (props) => {
         y = rect.bottom + 4;
       }
 
-      setTooltip({ content, visible: true, x, y });
+      const clampedPosition = clampTooltipPosition(x, y);
+      setTooltip({ content, visible: true, x: clampedPosition.x, y: clampedPosition.y });
     }
   };
 
@@ -484,6 +526,7 @@ const GenericTableHierarchy = (props) => {
       {tooltip.visible && tooltip.content && (
         <div
           id={tooltipId}
+          ref={tooltipRef}
           style={{
             position: 'fixed',
             left: `${tooltip.x}px`,
